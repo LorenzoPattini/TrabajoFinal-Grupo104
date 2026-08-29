@@ -1,13 +1,13 @@
-## Trabajo Final - Grupo104
+# Trabajo Final - Grupo104
 
-# Integrantes: 
+## Integrantes: 
 - Federico Quinteros
 - Lorenzo Pattini
 - Uriel Palma
   
-# Presentación del Trabajo Final Integrador de la Tecnicatura de Programación
+## Presentación del Trabajo Final Integrador de la Tecnicatura de Programación
 
-#  Cotizador de Seguros Automotores
+##  Cotizador de Seguros Automotores
 
 Sistema integral para la generación automatizada de presupuestos de seguros de autos. 
 Permite a usuarios cotizar en tiempo real el valor de una póliza en función de múltiples variables del vehículo, el conductor y el entorno.
@@ -19,12 +19,12 @@ El sistema entrega un precio final, basandose en factores como zona geográfica,
 
 ##  Tecnologías Utilizadas
 
-| **Backend** | Java + Spring Boot | Robustez, escalabilidad y ecosistema maduro para APIs REST y conexión a MongoDB. |
-| **Frontend** | TypeScript + React | Tipado estático para reducir errores en la lógica de cotización y componentes reutilizables para un dashboard ágil. |
-| **Base de Datos** | MongoDB Atlas | Esquema flexible: ideal para almacenar cotizaciones con atributos variables sin necesidad de migraciones complejas. |
-| **Build Tool** | Gradle | Gestión de dependencias y construcción del backend de forma eficiente. |
-| **Despliegue Frontend** | Vercel | - | Despliegue continuo (CI/CD) directamente desde el repositorio GitHub. |
-| **Despliegue Backend** | Render | - | Alojamiento económico y sencillo para servicios Spring Boot con conexión a MongoDB Atlas. |
+-  **Backend** | Java + Spring Boot | Robustez, escalabilidad y ecosistema maduro para APIs REST y conexión a MongoDB. 
+-  **Frontend** | TypeScript + React | Tipado estático para reducir errores en la lógica de cotización y componentes reutilizables para un dashboard ágil. 
+-  **Base de Datos** | MongoDB Atlas | Esquema flexible: ideal para almacenar cotizaciones con atributos variables sin necesidad de migraciones complejas. 
+- **Build Tool** | Gradle | Gestión de dependencias y construcción del backend de forma eficiente. 
+- **Despliegue Frontend** | Vercel |  Despliegue continuo (CI/CD) directamente desde el repositorio GitHub. 
+- **Despliegue Backend** | Render |  Alojamiento económico y sencillo para servicios Spring Boot con conexión a MongoDB Atlas. 
 
 ##  Objetivos y Características Principales
 
