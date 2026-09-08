@@ -21,7 +21,7 @@ El sistema entrega un precio final, basandose en factores como zona geográfica,
 
 - **Backend** | Java + Spring Boot | Robustez, escalabilidad y ecosistema maduro para APIs REST y conexión a MongoDB. 
 - **Frontend** | TypeScript + React | Tipado estático para reducir errores en la lógica de cotización y componentes reutilizables para un dashboard ágil. 
-- **Base de Datos (NoSQL)** | MongoDB Atlas | Esquema flexible: ideal para almacenar cotizaciones con atributos variables sin necesidad de migraciones complejas. Preferencia del grupo.
+- **Base de Datos (NoSQL)** | MongoDB Atlas | Esquema flexible: ideal para almacenar cotizaciones con atributos variables sin necesidad de migraciones complejas. Para utilizar el Embedding y evitar el congelamiento de valores; Reducción de Round-Trips y generar un Dashboard de Estadísticas; Alineación Natural con JSON evita la fricción de tener que traducir a tablas relacionales; Y como projecto que puede crecer requiere Escalabilidad Horizontal.
 - **Build Tool** | Gradle | Gestión de dependencias y construcción del backend de forma eficiente. 
 - **Despliegue Frontend** | Vercel |  Despliegue continuo (CI/CD) directamente desde el repositorio GitHub. 
 - **Despliegue Backend** | Render |  Alojamiento económico y sencillo para servicios Spring Boot con conexión a MongoDB Atlas. 
