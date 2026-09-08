@@ -1,0 +1,113 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Página-1" id="N6KLIK59kAIzng0dAN66">
+    <mxGraphModel dx="978" dy="529" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Usuario ingresa al sitio" vertex="1">
+          <mxGeometry height="50" width="199" x="314" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-2" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points" />
+            <mxPoint x="414" y="70" as="sourcePoint" />
+            <mxPoint x="414" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Ingreso de datos personales&lt;div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;(Nombre - DNI - Teléfono - Correo)&lt;/font&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="199" x="314" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-4" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points" />
+            <mxPoint x="414" y="200" as="sourcePoint" />
+            <mxPoint x="414" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Registro de Datos del Usuario&lt;div&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;Persistencia - MongoDB Atlas&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="199" x="314" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-7" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="414" y="340" as="sourcePoint" />
+            <mxPoint x="414" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Ingreso de datos del vehículo&lt;div&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;(Patente - Marca/Modelo - Año)&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="199" x="314" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-9" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="414" y="490" />
+            </Array>
+            <mxPoint x="414" y="460" as="sourcePoint" />
+            <mxPoint x="414" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;gradientColor=none;dashed=1;" value="Consulta a API externa&lt;div&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;(Obtención de datos del vehículo)&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="199" x="314" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-11" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="414" y="590" />
+            </Array>
+            <mxPoint x="414" y="590" as="sourcePoint" />
+            <mxPoint x="414" y="660" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-12" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Datos obtenidos del vehículo&lt;div&gt;&lt;font size=&quot;1&quot;&gt;(Versión - Combustible - Inf. Adicional)&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="199" x="314" y="670" as="geometry" />
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Ingreso de datos adicionales&lt;div&gt;&lt;font size=&quot;1&quot;&gt;(Edad del conductor - Código postal - Seguridad del vehículo)&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="199" x="314" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-15" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="413" y="720" as="sourcePoint" />
+            <mxPoint x="413" y="780" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-16" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="414" y="840" as="sourcePoint" />
+            <mxPoint x="414" y="880" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-17" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Cálculo de la cotización&lt;div&gt;&lt;font size=&quot;1&quot;&gt;(Valor base + Factores de riesgo + Reglas de negocio)&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="199" x="314" y="890" as="geometry" />
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-18" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="414" y="940" as="sourcePoint" />
+            <mxPoint x="414" y="980" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-19" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Presentación de resultados&lt;div&gt;&lt;font size=&quot;1&quot;&gt;(Aseguradora - Cobertura - Precio - Condiciones)&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="199" x="314" y="990" as="geometry" />
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-20" edge="1" parent="1" source="VbGfgYROnNz_fKbLeNaF-19" style="endArrow=classic;html=1;rounded=0;exitX=0.231;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points" />
+            <mxPoint x="400" y="1080" as="sourcePoint" />
+            <mxPoint x="300" y="1080" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-21" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;exitX=0.834;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points" />
+            <mxPoint x="479.9960000000001" y="1040" as="sourcePoint" />
+            <mxPoint x="530" y="1080" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-22" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Guardar cotización&lt;div&gt;&lt;font size=&quot;1&quot;&gt;(Persistencia)&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="120" x="220" y="1090" as="geometry" />
+        </mxCell>
+        <mxCell id="VbGfgYROnNz_fKbLeNaF-23" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Fin de la consulta&lt;div&gt;&lt;font size=&quot;1&quot;&gt;(Historial de cotizaciones)&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="120" x="490" y="1090" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
