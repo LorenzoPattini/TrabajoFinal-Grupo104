@@ -19,9 +19,9 @@ El sistema entrega un precio final, basandose en factores como zona geográfica,
 
 ##  Tecnologías Utilizadas
 
--  **Backend** | Java + Spring Boot | Robustez, escalabilidad y ecosistema maduro para APIs REST y conexión a MongoDB. 
--  **Frontend** | TypeScript + React | Tipado estático para reducir errores en la lógica de cotización y componentes reutilizables para un dashboard ágil. 
--  **Base de Datos** | MongoDB Atlas | Esquema flexible: ideal para almacenar cotizaciones con atributos variables sin necesidad de migraciones complejas. 
+- **Backend** | Java + Spring Boot | Robustez, escalabilidad y ecosistema maduro para APIs REST y conexión a MongoDB. 
+- **Frontend** | TypeScript + React | Tipado estático para reducir errores en la lógica de cotización y componentes reutilizables para un dashboard ágil. 
+- **Base de Datos (NoSQL)** | MongoDB Atlas | Esquema flexible: ideal para almacenar cotizaciones con atributos variables sin necesidad de migraciones complejas. Preferencia del grupo.
 - **Build Tool** | Gradle | Gestión de dependencias y construcción del backend de forma eficiente. 
 - **Despliegue Frontend** | Vercel |  Despliegue continuo (CI/CD) directamente desde el repositorio GitHub. 
 - **Despliegue Backend** | Render |  Alojamiento económico y sencillo para servicios Spring Boot con conexión a MongoDB Atlas. 
