@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/TrabajoFinal-Grupo104.iml" filepath="$PROJECT_DIR$/.idea/TrabajoFinal-Grupo104.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cotizador.iml" filepath="$PROJECT_DIR$/.idea/modules/cotizador.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cotizador.main.iml" filepath="$PROJECT_DIR$/.idea/modules/cotizador.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cotizador.test.iml" filepath="$PROJECT_DIR$/.idea/modules/cotizador.test.iml" />
     </modules>
   </component>
 </project>
