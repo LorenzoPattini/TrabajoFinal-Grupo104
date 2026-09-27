@@ -1,3 +1,6 @@
 spring:
   application:
     name: cotizador
+  mongodb:
+    uri: ${MONGODB_URI}
+
