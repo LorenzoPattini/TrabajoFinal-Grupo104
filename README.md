@@ -28,8 +28,9 @@ El sistema entrega un precio final, basandose en factores como zona geográfica,
 
 ##  Objetivos y Características Principales
 
-### 1️⃣ Datos Actualizados de Vehículos
-- **Consumo de fuentes externas:** Integración con APIs de patentes para obtener **marca, modelo, año, versión y tipo de combustible** automáticamente al ingresar la patente.
+### 1️⃣ Consulta de Datos del Vehículo
+- **Patente informativa:** El usuario ingresa la patente manualmente para registrarla junto a los datos del vehículo. La patente no se consulta ni se valida mediante una API externa y no se utiliza para recuperar datos técnicos.
+- **Consumo de fuentes externas:** Integración con una API de vehículos para consultar y seleccionar **marca, modelo, año, versión y tipo de combustible**, según la información que ofrezca el servicio. La consulta se realiza por selección de características del vehículo, no por patente.
 
 ### 2️⃣ Gestión y Persistencia de Usuarios
 - **Registro de prospectos:** Guardado de datos del titular y del conductor (nombre, DNI, fecha de nacimiento, correo) en MongoDB Atlas.
