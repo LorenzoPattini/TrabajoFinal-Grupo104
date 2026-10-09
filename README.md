@@ -40,7 +40,7 @@ El sistema entrega un precio final, basandose en factores como zona geográfica,
 La prima final se calcula aplicando reglas de negocio secuenciales sobre un valor base:
 - **Factor Regional:** Multiplicador según código postal (zonas de alto/bajo riesgo).
 - **Factor Personal:** Edad del conductor (recargo para menores de 25 años) y años de antigüedad de licencia.
-- **Factor del Vehículo:** Tipo de combustible (diésel/gasolina/eléctrico) y dispositivos de seguridad (alarma, GPS, cortacorriente) que otorgan descuentos.
+- **Factor del Vehículo:** Se aplican ajustes según el tipo de combustible, la antigüedad calculada a partir del año de fabricación y los dispositivos de seguridad instalados (alarma, GPS y cortacorriente).
 - **Simultaneidad:** El sistema genera simultáneamente la cotización final diferentes  aseguradoras.
 
 ### 4️⃣ Panel de Estadísticas y Conversión (Dashboard)
