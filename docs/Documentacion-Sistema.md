@@ -35,6 +35,7 @@ Se optó por embeber los datos del cliente, el vehículo y los factores aplicado
     "patente": "string",
     "marca": "string",
     "modelo": "string",
+    "version": "string",
     "anio": "number",
     "combustible": "string"
   },
@@ -68,6 +69,7 @@ erDiagram
         string patente
         string marca
         string modelo
+        string version
         number anio
         string combustible
     }
@@ -90,10 +92,10 @@ La base `cotizador-tfi` y la colección `cotizaciones` ya fueron creadas en el c
 ## 2. Definición funcional de cada módulo
 
 ### Módulo 1 — Consulta de datos del vehículo
-- **Descripción:** obtiene marca, modelo, año y combustible del vehículo a partir de una API externa de autos.
-- **Entrada:** selección del usuario (marca/modelo/año) desde los datos que ofrece la API.
-- **Salida:** objeto `vehiculo` completo para usar en el módulo de cálculo.
-- **Nota:** la patente se ingresa como dato informativo aparte, sin validarse contra ninguna API (no se cuenta con una de consulta por patente).
+- **Descripción:** permite registrar la patente como dato informativo y seleccionar, de forma independiente, las características técnicas del vehículo mediante información provista por una API externa de vehículos.
+- **Entrada:** patente ingresada manualmente por el usuario y selección de marca, modelo, año, versión y combustible, según los datos disponibles en la API externa.
+- **Proceso:** la patente no se envía a la API para consultar, validar ni recuperar información. La consulta externa se utiliza únicamente como fuente de datos para la selección de características del vehículo.
+- **Salida:** objeto `vehiculo` con la patente informativa y los datos técnicos seleccionados, que se utilizarán en el módulo de cálculo y se conservarán en la cotización.
 
 ### Módulo 2 — Gestión de usuarios/prospectos
 - **Descripción:** registra los datos del titular y conductor, y mantiene el historial de cotizaciones por cliente.
@@ -115,7 +117,8 @@ La base `cotizador-tfi` y la colección `cotizaciones` ya fueron creadas en el c
 ## 3. Requerimientos funcionales y no funcionales
 
 ### Funcionales
-- El sistema debe permitir seleccionar marca, modelo, año y combustible del vehículo desde una API externa.
+- El sistema debe permitir ingresar y registrar la patente como dato informativo, sin usarla para consultar o validar información en una API externa.
+- El sistema debe permitir seleccionar marca, modelo, año, versión y combustible a partir de información disponible en una API externa de vehículos, de forma independiente de la patente.
 - El sistema debe permitir registrar los datos del cliente y del conductor.
 - El sistema debe calcular el precio final de la póliza aplicando las reglas de negocio vigentes.
 - El sistema debe generar cotizaciones para varias aseguradoras de forma simultánea.
@@ -144,6 +147,6 @@ La prima final se calcula aplicando reglas secuenciales sobre un valor base:
 
 ## 5. Diagramas
 
-- **Diagrama de flujo general del sistema:** ver `docs/TP_Final_Diagrama_de_Flujo.jpg`.
+- **Diagrama de flujo general del sistema:** ver `docs/TP_Final_Diagrama_de_Flujo.jpg` (versión editable: `docs/TP_Final_Diagrama_de_Flujo.drawio`). La patente se registra como dato informativo; la API se consulta a partir de la selección de características del vehículo, no mediante la patente.
 - **Diagrama de la colección de MongoDB:** incluido en la sección 1 de este documento.
 - *(Diagrama de componentes/clases del backend: a definir en equipo.)*
