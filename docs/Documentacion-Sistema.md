@@ -127,8 +127,6 @@ La base `cotizador-tfi` y la colección `cotizaciones` ya fueron creadas en el c
 
 ### No funcionales
 
-## Requerimientos No Funcionales (RNF)
-
 ### RNF-01 – Usabilidad
 
 El sistema deberá contar con una interfaz clara e intuitiva, que permita a los usuarios identificar los campos obligatorios, ingresar la información necesaria y consultar los resultados de una cotización.
