@@ -40,13 +40,22 @@ Se optó por embeber los datos del cliente, el vehículo y los factores aplicado
     "combustible": "string"
   },
   "factoresAplicados": {
-    "zona": "string",
-    "edadConductor": "number",
-    "antiguedadLicencia": "number",
-    "dispositivosSeguridad": ["string"]
+    "factorZona": 1.20,
+    "factorEdad": 1.20,
+    "factorLicencia": 1.15,
+    "factorCombustible": 1.05,
+    "factorAntiguedadVehiculo": 1.10,
+    "factorSeguridad": 0.92
   },
-  "precioFinal": "number",
-  "fecha": "date"
+  "resultados": [
+    {
+      "aseguradora": "Aseguradora A",
+      "cobertura": "Terceros Completo",
+      "primaBase": 50000,
+      "precioFinal": 87983.28
+    }
+  ],
+  "fecha": "2026-10-09T00:00:00"
 }
 ```
 
