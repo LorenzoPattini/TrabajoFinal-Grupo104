@@ -116,14 +116,116 @@ La base `cotizador-tfi` y la colección `cotizaciones` ya fueron creadas en el c
 
 ## 3. Requerimientos funcionales y no funcionales
 
-### 3.1 Funcionales
-- El sistema debe permitir ingresar y registrar la patente como dato informativo, sin usarla para consultar o validar información en una API externa.
-- El sistema debe permitir seleccionar marca, modelo, año, versión y combustible a partir de información disponible en una API externa de vehículos, de forma independiente de la patente.
-- El sistema debe permitir registrar los datos del cliente y del conductor.
-- El sistema debe calcular el precio final de la póliza aplicando las reglas de negocio vigentes.
-- El sistema debe generar cotizaciones para varias aseguradoras de forma simultánea.
-- El sistema debe conservar el historial de cotizaciones por cliente.
-- El sistema debe mostrar estadísticas de conversión y demanda por zona.
+### 3.1 Requerimientos Funcionales (RF)
+
+Los requerimientos funcionales describen las funcionalidades que deberá proporcionar el sistema Cotizador de Seguros Automotores.
+
+Cada requerimiento incluye criterios de aceptación que permitirán verificar su correcto funcionamiento durante las etapas de desarrollo y prueba.
+
+### RF-01 – Registro informativo de patente
+
+**Descripción:**
+
+El sistema deberá permitir ingresar y registrar la patente del vehículo como dato informativo, sin utilizarla para consultar o validar información mediante una API externa.
+
+**Criterios de aceptación:**
+
+- CA-01.1: El usuario podrá ingresar la patente en el formulario de cotización.
+- CA-01.2: La patente ingresada se almacenará junto con los datos del vehículo.
+- CA-01.3: El ingreso de la patente no generará solicitudes a APIs externas.
+- CA-01.4: La patente no modificará los factores ni el precio final de la cotización.
+
+### RF-02 – Consulta y selección de datos del vehículo
+
+**Descripción:**
+
+El sistema deberá permitir seleccionar marca, modelo, año, versión y tipo de combustible utilizando la información disponible en una API externa de vehículos, independientemente de la patente ingresada.
+
+**Criterios de aceptación:**
+
+- CA-02.1: El usuario podrá consultar y seleccionar los datos técnicos del vehículo disponibles en la API externa.
+- CA-02.2: La selección de los datos técnicos se realizará sin utilizar la patente.
+- CA-02.3: El sistema conservará los datos seleccionados para utilizarlos en la cotización.
+- CA-02.4: El sistema informará al usuario cuando la API externa no esté disponible.
+- CA-02.5: No se permitirá continuar con la cotización si faltan datos técnicos obligatorios.
+
+### RF-03 – Registro de cliente y conductor
+
+**Descripción:**
+
+El sistema deberá permitir registrar los datos personales del cliente y del conductor para asociarlos a las cotizaciones generadas.
+
+**Criterios de aceptación:**
+
+- CA-03.1: El usuario podrá ingresar nombre, DNI, fecha de nacimiento y correo electrónico del cliente y del conductor, según corresponda.
+- CA-03.2: El sistema verificará que los campos obligatorios estén completos.
+- CA-03.3: El sistema validará el formato del correo electrónico y la fecha de nacimiento.
+- CA-03.4: Los datos ingresados se almacenarán en MongoDB Atlas.
+- CA-03.5: El sistema informará los errores de validación antes de permitir continuar.
+
+### RF-04 – Cálculo del precio de la póliza
+
+**Descripción:**
+
+El sistema deberá calcular el precio final mensual de una póliza aplicando las reglas de negocio vigentes sobre la prima base de la aseguradora y cobertura seleccionadas.
+
+**Criterios de aceptación:**
+
+- CA-04.1: El sistema obtendrá la prima base correspondiente a la aseguradora y cobertura.
+- CA-04.2: El cálculo aplicará los factores definidos para zona geográfica, edad del conductor, antigüedad de licencia, combustible, antigüedad del vehículo y dispositivos de seguridad.
+- CA-04.3: Los factores se aplicarán mediante la fórmula establecida en las reglas de negocio.
+- CA-04.4: El resultado final se expresará en pesos argentinos, con dos decimales.
+- CA-04.5: Ante datos inválidos o incompletos, el sistema no realizará el cálculo y mostrará un mensaje indicando el inconveniente.
+
+### RF-05 – Generación y comparación de cotizaciones
+
+**Descripción:**
+
+El sistema deberá generar cotizaciones para distintas aseguradoras a partir de una misma solicitud, permitiendo comparar las propuestas obtenidas.
+
+**Criterios de aceptación:**
+
+- CA-05.1: El sistema generará una propuesta por cada aseguradora que tenga disponible la cobertura solicitada.
+- CA-05.2: Todas las propuestas utilizarán los mismos datos del vehículo, conductor y ubicación geográfica.
+- CA-05.3: Cada aseguradora utilizará su propia prima base configurada.
+- CA-05.4: Los resultados mostrarán el nombre de la aseguradora, el tipo de cobertura y el precio mensual calculado.
+- CA-05.5: El usuario podrá visualizar las propuestas ordenadas de menor a mayor precio.
+
+### RF-06 – Historial de cotizaciones
+
+**Descripción:**
+
+El sistema deberá almacenar y permitir consultar las cotizaciones generadas para un cliente, conservando la información y los resultados correspondientes a cada operación.
+
+**Criterios de aceptación:**
+
+- CA-06.1: Cada cotización generada se almacenará en MongoDB Atlas con un identificador único.
+- CA-06.2: Las cotizaciones quedarán asociadas al cliente correspondiente.
+- CA-06.3: El sistema permitirá recuperar las cotizaciones anteriores de un cliente.
+- CA-06.4: El historial mostrará como mínimo la fecha, el vehículo, la aseguradora, la cobertura y el importe calculado.
+- CA-06.5: Las cotizaciones almacenadas conservarán los importes y factores originales aunque posteriormente se modifiquen las reglas de cálculo.
+
+### RF-07 – Estadísticas de conversión y demanda
+
+**Descripción:**
+
+El sistema deberá disponer de un panel de estadísticas que permita consultar indicadores relacionados con la generación de cotizaciones, las solicitudes formales de contratación y la distribución geográfica de la demanda.
+
+**Criterios de aceptación:**
+
+- CA-07.1: El panel mostrará la cantidad total de cotizaciones generadas.
+- CA-07.2: El sistema permitirá registrar cuándo una cotización pasa al estado de solicitud formal de contratación.
+- CA-07.3: El panel mostrará la cantidad de solicitudes formales de contratación.
+- CA-07.4: El sistema calculará la tasa de conversión mediante la relación entre solicitudes formales y cotizaciones generadas.
+- CA-07.5: El sistema mostrará la cantidad de cotizaciones agrupadas por código postal, permitiendo identificar las zonas con mayor demanda.
+
+**Fórmula de tasa de conversión:**
+
+Tasa de conversión (%) = (Cantidad de cotizaciones convertidas en solicitud formal / Cantidad total de cotizaciones) × 100
+
+Cuando no existan cotizaciones registradas, la tasa de conversión se mostrará como 0 %.
+
+Para evitar contar múltiples veces una misma cotización, cada cotización podrá contabilizarse como convertida una única vez.
 
 ### 3.2 No funcionales
 
