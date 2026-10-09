@@ -690,6 +690,6 @@ El objetivo principal es demostrar la aplicación de reglas de negocio, la autom
 
 ## 5. Diagramas
 
-- **Diagrama de flujo general del sistema:** ver `docs/TP_Final_Diagrama_de_Flujo.jpg` (versión editable: `docs/TP_Final_Diagrama_de_Flujo.drawio`). La patente se registra como dato informativo; la API se consulta a partir de la selección de características del vehículo, no mediante la patente.
+- **Diagrama de flujo general del sistema:** ver `docs/TP_Final_Diagrama_de_Flujo.jpg`. La patente se registra como dato informativo; la API se consulta a partir de la selección de características del vehículo, no mediante la patente.
 - **Diagrama de la colección de MongoDB:** incluido en la sección 1 de este documento.
 - *(Diagrama de componentes/clases del backend: a definir en equipo.)*
