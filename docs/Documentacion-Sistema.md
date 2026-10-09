@@ -692,4 +692,14 @@ El objetivo principal es demostrar la aplicación de reglas de negocio, la autom
 
 - **Diagrama de flujo general del sistema:** ver `docs/TP_Final_Diagrama_de_Flujo.jpg`. La patente se registra como dato informativo; la API se consulta a partir de la selección de características del vehículo, no mediante la patente.
 - **Diagrama de la colección de MongoDB:** incluido en la sección 1 de este documento.
-- *(Diagrama de componentes/clases del backend: a definir en equipo.)*
+  
+### Diagrama de clases propuesto
+
+El siguiente diagrama representa la estructura de clases propuesta
+para el backend del sistema Cotizador de Seguros Automotores,
+desarrollado con Java y Spring Boot.
+
+Incluye las principales entidades del dominio, sus atributos,
+relaciones y los componentes encargados de la lógica de cotización.
+
+![Diagrama de clases del Cotizador de Seguros Automotores](https://github.com/user-attachments/assets/59303a16-47e2-457c-955e-5a025040b1e8)
