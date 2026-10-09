@@ -126,11 +126,107 @@ La base `cotizador-tfi` y la colección `cotizaciones` ya fueron creadas en el c
 - El sistema debe mostrar estadísticas de conversión y demanda por zona.
 
 ### No funcionales
-*(a definir en equipo)*
-- Tiempo de respuesta esperado del cálculo de cotización.
-- Disponibilidad del servicio.
-- Seguridad y confidencialidad de los datos personales almacenados.
-- Escalabilidad ante el crecimiento del volumen de cotizaciones.
+
+## Requerimientos No Funcionales (RNF)
+
+### RNF-01 – Usabilidad
+
+El sistema deberá contar con una interfaz clara e intuitiva, que permita a los usuarios identificar los campos obligatorios, ingresar la información necesaria y consultar los resultados de una cotización.
+
+**Criterios de cumplimiento:**
+- Los formularios deberán identificar los campos obligatorios.
+- Los errores de ingreso deberán mostrarse mediante mensajes comprensibles.
+- Los resultados deberán presentar claramente la aseguradora, cobertura y precio calculado.
+- El usuario deberá poder identificar cómo continuar o corregir los datos ingresados.
+
+**Verificación:** Pruebas manuales del recorrido de cotización, tanto con datos válidos como inválidos.
+
+### RNF-02 – Diseño adaptable (Responsive)
+
+La interfaz deberá adaptarse a diferentes tamaños de pantalla, permitiendo utilizar las funcionalidades principales desde computadoras y dispositivos móviles.
+
+**Criterios de cumplimiento:**
+- Las pantallas principales deberán visualizarse correctamente en resoluciones de escritorio y dispositivos móviles.
+- Los formularios y botones deberán permanecer accesibles.
+- No deberá existir desplazamiento horizontal innecesario debido al diseño.
+- La información de las cotizaciones deberá poder leerse sin superposiciones.
+
+**Verificación:** Pruebas manuales utilizando las herramientas de dispositivos de Google Chrome, con anchos de pantalla de 375 px, 768 px y 1366 px.
+
+### RNF-03 – Rendimiento
+
+El sistema deberá responder en tiempos razonables durante las operaciones principales, considerando condiciones normales de conexión y disponibilidad de los servicios externos.
+
+**Criterios de cumplimiento:**
+- Las operaciones de consulta de cotizaciones almacenadas deberán responder en un máximo de 5 segundos.
+- El cálculo de una cotización con datos válidos deberá completarse en un máximo de 5 segundos cuando no dependa de llamadas externas.
+- Durante las consultas a APIs externas, la interfaz deberá informar al usuario que la operación se encuentra en proceso.
+
+**Verificación:** Pruebas manuales utilizando las herramientas de red del navegador y registros del backend, en condiciones normales de funcionamiento.
+
+*Los tiempos no incluyen demoras excepcionales de servicios externos ni el arranque en frío del servidor de Render.*
+
+### RNF-04 – Seguridad y protección de datos
+
+El sistema deberá aplicar medidas básicas de seguridad para proteger la información personal registrada y evitar la exposición de credenciales de acceso a servicios externos.
+
+**Criterios de cumplimiento:**
+- Las comunicaciones entre frontend y backend desplegados deberán utilizar HTTPS.
+- Las credenciales de MongoDB Atlas y otras claves privadas deberán almacenarse mediante variables de entorno del backend.
+- No deberán incluirse contraseñas ni claves privadas dentro del repositorio GitHub.
+- El backend deberá validar los datos recibidos antes de procesarlos o almacenarlos.
+- Las respuestas de error no deberán mostrar contraseñas ni información de configuración interna.
+
+**Verificación:** Revisión del repositorio, configuración de Vercel y Render, y pruebas de validación de entradas en la API.
+
+### RNF-05 – Compatibilidad
+
+El frontend deberá funcionar correctamente en navegadores web modernos.
+
+**Criterios de cumplimiento:**
+- La aplicación deberá poder ejecutarse en las versiones actuales de Google Chrome y Microsoft Edge.
+- Las funcionalidades principales deberán mantener un comportamiento consistente en ambos navegadores.
+- El sistema no deberá requerir extensiones adicionales para su utilización.
+
+**Verificación:** Pruebas manuales del flujo principal de cotización en Chrome y Edge.
+
+### RNF-06 – Mantenibilidad
+
+El código fuente deberá organizarse de manera que facilite su comprensión, modificación y ampliación por los integrantes del grupo.
+
+**Criterios de cumplimiento:**
+- El frontend deberá separar componentes, páginas, servicios y tipos de datos.
+- El backend deberá mantener separadas las responsabilidades de controladores, servicios y acceso a datos.
+- Las configuraciones dependientes del entorno deberán mantenerse fuera de la lógica de negocio.
+- El proyecto deberá contar con instrucciones de instalación y ejecución en sus archivos README.
+- El frontend deberá superar las verificaciones de compilación y análisis estático configuradas en el proyecto.
+
+**Verificación:** Revisión de la estructura del repositorio, documentación técnica y ejecución de `npm run lint` y `npm run build`.
+
+### RNF-07 – Manejo de errores
+
+El sistema deberá informar de manera comprensible los errores que puedan ocurrir durante la carga de información, las consultas externas o la generación de cotizaciones.
+
+**Criterios de cumplimiento:**
+- Los formularios deberán identificar entradas inválidas o incompletas.
+- Si una API externa no responde, el sistema deberá mostrar un mensaje informativo.
+- Si no puede generarse una cotización, se deberá informar al usuario sin mostrar errores técnicos internos.
+- La aplicación no deberá quedar bloqueada permanentemente ante una solicitud fallida.
+
+**Verificación:** Pruebas manuales con campos inválidos, interrupciones simuladas de conexión y respuestas de error del backend.
+
+### RNF-08 – Despliegue y ejecución
+
+El sistema deberá poder ejecutarse en un entorno local de desarrollo y publicarse utilizando las plataformas seleccionadas por el equipo.
+
+**Criterios de cumplimiento:**
+- El frontend deberá poder ejecutarse localmente mediante `npm install` y `npm run dev`.
+- El backend deberá contar con instrucciones para su ejecución local.
+- El frontend deberá poder generar una compilación de producción mediante `npm run build`.
+- La aplicación deberá poder desplegarse en Vercel y comunicarse con el backend publicado en Render.
+- El backend deberá poder conectarse a MongoDB Atlas mediante su configuración correspondiente.
+
+**Verificación:** Ejecución local de ambos proyectos, compilación del frontend y prueba de una operación completa de cotización en el entorno desplegado.
 
 ---
 
