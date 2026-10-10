@@ -20,25 +20,44 @@ Se utiliza **MongoDB Atlas** (NoSQL, orientado a documentos) en lugar de una bas
 ### 1.3 Decisión de diseño: embedding vs. referencias
 Se optó por embeber los datos del cliente, el vehículo y los factores aplicados dentro de cada documento de cotización, en lugar de crear colecciones separadas y referenciarlas. Motivo: una cotización es un registro histórico que no debe cambiar aunque el cliente actualice sus datos más adelante — necesitamos una "foto" congelada de la información tal como era en el momento de cotizar, no una referencia viva.
 
-### 1.4 Esquema
+### 1.4 Esquema propuesto de cotización
+
+El siguiente documento JSON es **un ejemplo de diseño**, no una exportación de un registro productivo. Representa una solicitud con varias propuestas, sus factores y el estado necesario para medir la conversión. En MongoDB, `_id` y las fechas pueden almacenarse con tipos BSON equivalentes.
 
 ```json
 {
-  "_id": "ObjectId",
+  "_id": "ObjectId (generado por MongoDB)",
+  "fecha": "2026-10-09T00:00:00",
+  "estado": "COTIZADA",
   "cliente": {
-    "nombre": "string",
-    "dni": "string",
-    "fechaNacimiento": "date",
-    "email": "string"
+    "nombre": "Cliente de ejemplo",
+    "dni": "00000000",
+    "fechaNacimiento": "1995-01-01",
+    "email": "ejemplo@correo.test"
+  },
+  "conductor": {
+    "nombre": "Conductor de ejemplo",
+    "dni": "11111111",
+    "fechaNacimiento": "2003-01-01",
+    "antiguedadLicencia": 1
   },
   "vehiculo": {
-    "patente": "string",
-    "marca": "string",
-    "modelo": "string",
-    "version": "string",
-    "anio": "number",
-    "combustible": "string"
+    "patente": "ABC123",
+    "marca": "Marca de ejemplo",
+    "modelo": "Modelo de ejemplo",
+    "version": "Version de ejemplo",
+    "anio": 2018,
+    "combustible": "Diesel",
+    "dispositivosSeguridad": {
+      "alarma": true,
+      "gps": true,
+      "cortacorriente": false
+    }
   },
+  "codigoPostal": "5000",
+  "categoriaZona": "ALTA",
+  "coberturaSolicitada": "Terceros Completo",
+  "antiguedadVehiculo": 8,
   "factoresAplicados": {
     "factorZona": 1.20,
     "factorEdad": 1.20,
@@ -48,25 +67,29 @@ Se optó por embeber los datos del cliente, el vehículo y los factores aplicado
     "factorSeguridad": 0.92
   },
   "resultados": [
-    {
-      "aseguradora": "Aseguradora A",
-      "cobertura": "Terceros Completo",
-      "primaBase": 50000,
-      "precioFinal": 87983.28
-    }
+    {"aseguradora": "Aseguradora A", "cobertura": "Terceros Completo", "primaBase": 50000.00, "precioFinal": 87983.28},
+    {"aseguradora": "Aseguradora B", "cobertura": "Terceros Completo", "primaBase": 48000.00, "precioFinal": 84463.95},
+    {"aseguradora": "Aseguradora C", "cobertura": "Terceros Completo", "primaBase": 52000.00, "precioFinal": 91502.61}
   ],
-  "fecha": "2026-10-09T00:00:00"
+  "solicitudFormal": null
 }
 ```
 
-### 1.5 Diagrama de la colección
+
+### 1.5 Diagrama de estructura documental
+
+El siguiente esquema muestra subdocumentos embebidos y arreglos en `cotizaciones`. No representa tablas relacionales ni colecciones independientes.
 
 ```mermaid
 erDiagram
     COTIZACION {
-        ObjectId _id
-        number precioFinal
-        date fecha
+        ObjectId id
+        datetime fecha
+        string estado
+        string codigoPostal
+        string categoriaZona
+        string coberturaSolicitada
+        int antiguedadVehiculo
     }
     CLIENTE {
         string nombre
@@ -74,27 +97,82 @@ erDiagram
         date fechaNacimiento
         string email
     }
+    CONDUCTOR {
+        string nombre
+        string dni
+        date fechaNacimiento
+        int antiguedadLicencia
+    }
     VEHICULO {
         string patente
         string marca
         string modelo
         string version
-        number anio
+        int anio
         string combustible
     }
+    SEGURIDAD {
+        boolean alarma
+        boolean gps
+        boolean cortacorriente
+    }
     FACTORES_APLICADOS {
-        string zona
-        number edadConductor
-        number antiguedadLicencia
-        string dispositivosSeguridad
+        decimal factorZona
+        decimal factorEdad
+        decimal factorLicencia
+        decimal factorCombustible
+        decimal factorAntiguedadVehiculo
+        decimal factorSeguridad
+    }
+    PROPUESTA {
+        string aseguradora
+        string cobertura
+        decimal primaBase
+        decimal precioFinal
+    }
+    SOLICITUD_FORMAL {
+        string aseguradora
+        string cobertura
+        decimal precioSeleccionado
+        datetime fechaSolicitud
     }
     COTIZACION ||--|| CLIENTE : embebe
+    COTIZACION ||--|| CONDUCTOR : embebe
     COTIZACION ||--|| VEHICULO : embebe
+    VEHICULO ||--|| SEGURIDAD : embebe
     COTIZACION ||--|| FACTORES_APLICADOS : embebe
+    COTIZACION ||--|{ PROPUESTA : contiene
+    COTIZACION ||--o| SOLICITUD_FORMAL : puede_contener
 ```
 
-### 1.6 Evidencia
-La base `cotizador-tfi` y la colección `cotizaciones` ya fueron creadas en el cluster de MongoDB Atlas del equipo, con un documento de ejemplo cargado que valida la estructura definida arriba.
+### 1.6 Estado de persistencia y evidencia
+
+La documentación original indica que el equipo creó la base `cotizador-tfi`, la colección `cotizaciones` y un documento de prueba en MongoDB Atlas. **No se ha comprobado en esta revisión que el documento cargado coincida con el esquema ampliado de la sección 1.4.** El grupo deberá actualizarlo y adjuntar una captura o consulta de evidencia cuando corresponda.
+
+### 1.7 Diccionario de datos resumido
+
+| Campo / ruta | Tipo lógico | Descripción / validación |
+|---|---|---|
+| `_id` | ObjectId | Identificador único de la cotización, generado por MongoDB. |
+| `fecha` | Fecha y hora | Momento en que se genera la cotización. |
+| `estado` | Enum / texto | `COTIZADA` o `SOLICITUD_FORMAL` para el alcance inicial. |
+| `cliente` | Objeto | Datos identificatorios y de contacto del titular. |
+| `conductor` | Objeto | Datos de quien conducirá; puede ser una persona distinta del cliente. |
+| `conductor.antiguedadLicencia` | Entero | Años completos, no negativos y compatibles con la edad. |
+| `vehiculo.patente` | Texto | Dato informativo; no se envía a la API ni afecta el cálculo. |
+| `vehiculo.marca/modelo/version` | Texto | Características seleccionadas desde la fuente externa. |
+| `vehiculo.anio` | Entero | Año entre 1900 y el año de cotización. |
+| `vehiculo.combustible` | Enum / texto | Nafta, Diésel, GNC, Híbrido o Eléctrico. |
+| `vehiculo.dispositivosSeguridad` | Objeto de booleanos | Alarma, GPS y cortacorriente. |
+| `codigoPostal` | Texto | Código postal utilizado para la categoría de riesgo; se conserva como texto. |
+| `categoriaZona` | Enum / texto | Riesgo bajo, medio o alto según configuración. |
+| `antiguedadVehiculo` | Entero | Año de cotización menos año de fabricación. |
+| `coberturaSolicitada` | Texto | Cobertura elegida para comparar primas. |
+| `factoresAplicados` | Objeto de decimales | Los seis multiplicadores aplicados; conserva la foto histórica del cálculo. |
+| `resultados` | Arreglo de objetos | Una propuesta por aseguradora con cobertura disponible. |
+| `resultados[].primaBase` | Decimal | Prima base mensual configurada. |
+| `resultados[].precioFinal` | Decimal | Importe calculado y redondeado a dos decimales. |
+| `solicitudFormal` | Objeto o nulo | Propuesta confirmada, fecha e importe histórico; una conversión como máximo por cotización. |
 
 ---
 
@@ -117,7 +195,7 @@ La base `cotizador-tfi` y la colección `cotizaciones` ya fueron creadas en el c
 - **Salida:** documento `cotizacion` completo, persistido en la colección `cotizaciones`.
 
 ### Módulo 4 — Dashboard de estadísticas
-- **Descripción:** presenta el embudo de conversión (cotización → compra) y un mapa de calor geográfico por zona.
+- **Descripción:** presenta el embudo de conversión (cotización → solicitud formal) y un mapa de calor geográfico por zona.
 - **Entrada:** lectura agregada sobre la colección `cotizaciones`.
 - **Salida:** visualizaciones para el equipo comercial.
 
@@ -236,9 +314,23 @@ Cuando no existan cotizaciones registradas, la tasa de conversión se mostrará 
 
 Para evitar contar múltiples veces una misma cotización, cada cotización podrá contabilizarse como convertida una única vez.
 
-### 3.2 No funcionales
+### RF-08 – Solicitud formal de contratación (funcionalidad propuesta)
 
-### RNF-01 – Usabilidad
+**Descripción:** El sistema deberá permitir seleccionar una de las propuestas generadas y registrar la intención de contratarla, sin efectuar pagos ni emitir una póliza real.
+
+**Criterios de aceptación:**
+- CA-08.1: El usuario podrá seleccionar una propuesta existente de la cotización.
+- CA-08.2: El sistema mostrará aseguradora, cobertura y precio antes de confirmar.
+- CA-08.3: Al confirmar, se registrará una solicitud vinculada a la cotización en MongoDB Atlas.
+- CA-08.4: El sistema conservará la fecha y los datos de la propuesta seleccionada.
+- CA-08.5: No se permitirá contabilizar más de una conversión por cotización.
+- CA-08.6: Cancelar la confirmación no modificará el estado de la cotización.
+
+**Alcance:** solicitud de interés comercial, sin compra, cobro ni emisión de póliza. Requiere aprobación definitiva del equipo.
+
+### 3.2 Requerimientos No Funcionales (RNF)
+
+#### RNF-01 – Usabilidad
 
 El sistema deberá contar con una interfaz clara e intuitiva, que permita a los usuarios identificar los campos obligatorios, ingresar la información necesaria y consultar los resultados de una cotización.
 
@@ -250,7 +342,7 @@ El sistema deberá contar con una interfaz clara e intuitiva, que permita a los 
 
 **Verificación:** Pruebas manuales del recorrido de cotización, tanto con datos válidos como inválidos.
 
-### RNF-02 – Diseño adaptable (Responsive)
+#### RNF-02 – Diseño adaptable (Responsive)
 
 La interfaz deberá adaptarse a diferentes tamaños de pantalla, permitiendo utilizar las funcionalidades principales desde computadoras y dispositivos móviles.
 
@@ -262,7 +354,7 @@ La interfaz deberá adaptarse a diferentes tamaños de pantalla, permitiendo uti
 
 **Verificación:** Pruebas manuales utilizando las herramientas de dispositivos de Google Chrome, con anchos de pantalla de 375 px, 768 px y 1366 px.
 
-### RNF-03 – Rendimiento
+#### RNF-03 – Rendimiento
 
 El sistema deberá responder en tiempos razonables durante las operaciones principales, considerando condiciones normales de conexión y disponibilidad de los servicios externos.
 
@@ -275,7 +367,7 @@ El sistema deberá responder en tiempos razonables durante las operaciones princ
 
 *Los tiempos no incluyen demoras excepcionales de servicios externos ni el arranque en frío del servidor de Render.*
 
-### RNF-04 – Seguridad y protección de datos
+#### RNF-04 – Seguridad y protección de datos
 
 El sistema deberá aplicar medidas básicas de seguridad para proteger la información personal registrada y evitar la exposición de credenciales de acceso a servicios externos.
 
@@ -288,7 +380,7 @@ El sistema deberá aplicar medidas básicas de seguridad para proteger la inform
 
 **Verificación:** Revisión del repositorio, configuración de Vercel y Render, y pruebas de validación de entradas en la API.
 
-### RNF-05 – Compatibilidad
+#### RNF-05 – Compatibilidad
 
 El frontend deberá funcionar correctamente en navegadores web modernos.
 
@@ -299,7 +391,7 @@ El frontend deberá funcionar correctamente en navegadores web modernos.
 
 **Verificación:** Pruebas manuales del flujo principal de cotización en Chrome y Edge.
 
-### RNF-06 – Mantenibilidad
+#### RNF-06 – Mantenibilidad
 
 El código fuente deberá organizarse de manera que facilite su comprensión, modificación y ampliación por los integrantes del grupo.
 
@@ -312,7 +404,7 @@ El código fuente deberá organizarse de manera que facilite su comprensión, mo
 
 **Verificación:** Revisión de la estructura del repositorio, documentación técnica y ejecución de `npm run lint` y `npm run build`.
 
-### RNF-07 – Manejo de errores
+#### RNF-07 – Manejo de errores
 
 El sistema deberá informar de manera comprensible los errores que puedan ocurrir durante la carga de información, las consultas externas o la generación de cotizaciones.
 
@@ -324,7 +416,7 @@ El sistema deberá informar de manera comprensible los errores que puedan ocurri
 
 **Verificación:** Pruebas manuales con campos inválidos, interrupciones simuladas de conexión y respuestas de error del backend.
 
-### RNF-08 – Despliegue y ejecución
+#### RNF-08 – Despliegue y ejecución
 
 El sistema deberá poder ejecutarse en un entorno local de desarrollo y publicarse utilizando las plataformas seleccionadas por el equipo.
 
@@ -339,7 +431,7 @@ El sistema deberá poder ejecutarse en un entorno local de desarrollo y publicar
 
 ---
 
-## 4. # Reglas de Negocio y Lógica de Cálculo de Cotizaciones
+## 4. Reglas de Negocio y Lógica de Cálculo de Cotizaciones
 
 ### 4.1 Descripción general
 
@@ -688,18 +780,275 @@ El objetivo principal es demostrar la aplicación de reglas de negocio, la autom
 
 ---
 
-## 5. Diagramas
+## 5. Diagramas de análisis y arquitectura
 
-- **Diagrama de flujo general del sistema:** ver `docs/TP_Final_Diagrama_de_Flujo.jpg`. La patente se registra como dato informativo; la API se consulta a partir de la selección de características del vehículo, no mediante la patente.
-- **Diagrama de la colección de MongoDB:** incluido en la sección 1 de este documento.
-  
-### Diagrama de clases propuesto
+### 5.1 Diagrama de flujo general
 
-El siguiente diagrama representa la estructura de clases propuesta
-para el backend del sistema Cotizador de Seguros Automotores,
-desarrollado con Java y Spring Boot.
+Archivo previsto en el repositorio: `docs/TP_Final_Diagrama_de_Flujo.jpg`. **Verificar el contenido de la imagen antes de entregar**, porque este documento no modifica automáticamente ese archivo. El flujo acordado es: registro de patente informativa → consulta externa por selección de características (sin patente) → datos de conductor y zona → validación → cálculo → comparación → eventual solicitud formal.
 
-Incluye las principales entidades del dominio, sus atributos,
-relaciones y los componentes encargados de la lógica de cotización.
+### 5.2 Diagrama de clases propuesto
+
+Representa entidades de dominio, atributos y relaciones del backend Java + Spring Boot; es un **diseño previsto, no evidencia de clases implementadas**.
 
 ![Diagrama de clases del Cotizador de Seguros Automotores](https://github.com/user-attachments/assets/59303a16-47e2-457c-955e-5a025040b1e8)
+
+
+### 5.3 Diagrama de casos de uso (visión funcional)
+
+```mermaid
+flowchart LR
+    U["Usuario / Prospecto"]
+    ADM["Administrador autorizado"]
+    API["API externa de vehículos"]
+    subgraph SISTEMA["Cotizador de Seguros Automotores"]
+        CU1(["CU-01 Registrar patente informativa"])
+        CU2(["CU-02 Seleccionar vehículo"])
+        CU3(["CU-03 Registrar datos personales"])
+        CU4(["CU-04 Generar cotizaciones"])
+        CU5(["CU-05 Comparar propuestas"])
+        CU6(["CU-06 Consultar historial"])
+        CU7(["CU-07 Solicitar contratación"])
+        CU8(["CU-08 Consultar estadísticas"])
+    end
+    U --- CU1
+    U --- CU2
+    U --- CU3
+    U --- CU4
+    U --- CU5
+    U --- CU7
+    ADM --- CU6
+    ADM --- CU8
+    API --- CU2
+```
+
+Es una representación funcional de actores y casos de uso en Mermaid. Para una entrega UML estricta, reproducir estos elementos en un diagrama de casos de uso UML (actores, elipses y límite del sistema).
+
+### 5.4 Diagrama de componentes propuesto
+
+```mermaid
+flowchart LR
+    subgraph FRONT["Frontend - React / TypeScript"]
+        UI["Formularios y comparación"]
+        DASH["Dashboard"]
+        HTTP["Cliente HTTP Axios"]
+        UI --> HTTP
+        DASH --> HTTP
+    end
+    subgraph BACK["Backend - Java / Spring Boot"]
+        REST["API REST / controladores"]
+        SERV["Servicios de cotización"]
+        FACT["Cálculo de factores"]
+        PERS["Repositorios de persistencia"]
+        REST --> SERV
+        SERV --> FACT
+        SERV --> PERS
+    end
+    HTTP -->|"HTTPS / JSON"| REST
+    PERS -->|"Driver MongoDB"| DB[("MongoDB Atlas")]
+    SERV -->|"Consulta técnica sin patente"| VEH["API externa de vehículos"]
+```
+
+### 5.5 Diagrama de despliegue previsto
+
+```mermaid
+flowchart TB
+    BROWSER["Navegador del usuario"] -->|"HTTPS"| VERCEL["Vercel: aplicación React compilada"]
+    VERCEL -.->|"Archivos estáticos"| BROWSER
+    BROWSER -->|"HTTPS / REST"| RENDER["Render: API Spring Boot"]
+    RENDER -->|"Conexión autenticada / TLS"| MONGO[("MongoDB Atlas")]
+    RENDER -->|"HTTPS"| API["API externa de vehículos"]
+```
+
+El despliegue se presenta como arquitectura objetivo. Las URL definitivas, variables de entorno, CORS y disponibilidad de la API se verificarán durante la integración. El navegador consume la API desplegada; Vercel aloja el frontend y no ejecuta el algoritmo de cotización.
+
+---
+
+## 6. Casos de uso
+
+### 6.1 Actores y alcance
+
+- **Usuario / Prospecto:** registra los datos, cotiza, compara y eventualmente manifiesta intención de contratar.
+- **Administrador autorizado:** consulta historial según permisos y visualiza estadísticas de conversión y demanda.
+- **API externa de vehículos:** servicio secundario que entrega información por selección de características, nunca a partir de la patente.
+
+El acceso al historial requiere autorización. El mecanismo de autenticación y roles debe acordarse e implementarse antes de exponer datos personales. La propuesta inicial no requiere pagos ni emisión de pólizas.
+
+### 6.2 Catálogo
+
+| Caso | Nombre | Actor | RF |
+|---|---|---|---|
+| CU-01 | Registrar patente informativa | Usuario | RF-01 |
+| CU-02 | Seleccionar datos del vehículo | Usuario, API externa | RF-02 |
+| CU-03 | Registrar cliente y conductor | Usuario | RF-03 |
+| CU-04 | Generar cotizaciones | Usuario | RF-04, RF-05 |
+| CU-05 | Comparar propuestas | Usuario | RF-05 |
+| CU-06 | Consultar historial | Usuario autorizado | RF-06 |
+| CU-07 | Solicitar contratación | Usuario | RF-08 |
+| CU-08 | Consultar estadísticas | Administrador | RF-07 |
+
+### CU-01 – Registrar patente informativa
+
+- **Precondición:** solicitud de cotización iniciada.
+- **Flujo principal:** (1) El sistema muestra el campo patente. (2) El usuario ingresa el dato. (3) El sistema lo incorpora a la solicitud. (4) Al guardar la cotización, conserva la patente.
+- **Alternativa:** antes de confirmar, el usuario puede corregir el valor.
+- **Postcondición:** la patente queda almacenada, sin consulta externa ni efecto en el cálculo.
+- **Reglas:** RN-08.
+
+### CU-02 – Seleccionar datos del vehículo
+
+- **Precondición:** el usuario dispone del formulario y el servicio externo está accesible.
+- **Flujo principal:** (1) El sistema consulta el catálogo externo. (2) El usuario selecciona marca y modelo. (3) Selecciona año, versión y combustible entre opciones disponibles. (4) Se validan los datos obligatorios y se conservan.
+- **Alternativas:** servicio no disponible → mensaje y bloqueo de avance; datos incompletos → solicitar corrección; cambio de marca → actualizar opciones dependientes.
+- **Postcondición:** información técnica disponible para cotizar, independientemente de la patente.
+- **Reglas:** RN-05, RN-09, RN-10.
+
+### CU-03 – Registrar cliente y conductor
+
+- **Precondición:** proceso de cotización iniciado.
+- **Flujo principal:** (1) El usuario carga datos de cliente y conductor. (2) Informa fecha de nacimiento y antigüedad de licencia del conductor. (3) El sistema valida obligatoriedad y formatos. (4) Conserva los datos para la solicitud y posterior persistencia.
+- **Alternativas:** email inválido o campos vacíos → pedir corrección; conductor menor de 18 → no permitir cotizar.
+- **Postcondición:** información del cliente y conductor disponible y validada.
+- **Reglas:** RN-02, RN-03, RN-10.
+
+### CU-04 – Generar cotizaciones
+
+- **Precondición:** información obligatoria válida, código postal configurado y cobertura seleccionada.
+- **Flujo principal:** (1) El usuario solicita cotizar. (2) El frontend envía datos por REST. (3) El backend valida. (4) Recupera primas base y seis factores. (5) Aplica la fórmula y redondea al final. (6) Genera propuestas de las aseguradoras con cobertura disponible. (7) Guarda los datos y devuelve resultados.
+- **Alternativas:** datos inválidos → respuesta de validación; código postal desconocido → solicitar corrección; sin aseguradoras disponibles → informar; fallo de persistencia → no presentar la operación como guardada.
+- **Postcondición:** cotización persistida con importes y factores históricos cuando la operación finaliza correctamente.
+- **Reglas:** RN-01 a RN-07, RN-10 a RN-13.
+
+### CU-05 – Comparar propuestas
+
+- **Precondición:** existe al menos una propuesta calculada.
+- **Flujo principal:** (1) Se muestran aseguradora, cobertura e importe. (2) Se permite ordenar por precio. (3) El usuario consulta y selecciona una propuesta si desea avanzar.
+- **Alternativas:** una sola aseguradora → mostrar una propuesta; ninguna → mensaje informativo.
+- **Postcondición:** propuestas comparadas, sin contratación automática.
+- **Reglas:** RN-07, RN-13.
+
+### CU-06 – Consultar historial de cotizaciones
+
+- **Precondición:** existe un mecanismo de acceso autorizado y una identificación válida del cliente.
+- **Flujo principal:** (1) El usuario autorizado accede al historial. (2) Solicita las cotizaciones del cliente. (3) El backend verifica permisos. (4) Recupera y muestra fechas, vehículo, propuestas y valores históricos.
+- **Alternativas:** sin registros → listado vacío; sin autorización → denegar; fallo de BD → informar sin mostrar datos internos.
+- **Postcondición:** consulta de registros sin modificarlos.
+- **Reglas:** RN-12.
+
+### CU-07 – Solicitar contratación de una cobertura
+
+- **Precondición:** cotización generada y propuesta seleccionada.
+- **Flujo principal:** (1) El usuario selecciona una propuesta. (2) El sistema muestra resumen. (3) El usuario confirma. (4) Se registra `solicitudFormal` y estado `SOLICITUD_FORMAL`. (5) Se comunica el resultado.
+- **Alternativas:** cancelar → sin cambios; segunda confirmación → no duplicar conversión; error al guardar → mostrar fallo.
+- **Postcondición:** intención comercial registrada, sin emitir póliza ni cobrar.
+- **Reglas:** RN-12, RN-13. **Asociado a RF-08 propuesto.**
+
+### CU-08 – Consultar estadísticas y conversión
+
+- **Precondición:** acceso administrativo autorizado.
+- **Flujo principal:** (1) El administrador solicita el dashboard. (2) El backend agrega cotizaciones por código postal y cuenta cotizaciones y conversiones únicas. (3) Calcula tasa = convertidas / total × 100. (4) Muestra indicadores.
+- **Alternativas:** sin cotizaciones → totales y tasa en 0; error de consulta → mensaje controlado.
+- **Postcondición:** visualización estadística sin modificar registros.
+- **Reglas:** RN-12, RN-13.
+
+---
+
+## 7. Matriz de trazabilidad y pruebas previstas
+
+La siguiente matriz vincula requerimientos, reglas y casos de uso. **Los CP son identificadores de pruebas a diseñar y ejecutar**, no pruebas aprobadas.
+
+| RF | Descripción resumida | CU | RN | CP previstos |
+|---|---|---|---|---|
+| RF-01 | Patente informativa | CU-01 | RN-08 | CP-01, CP-02 |
+| RF-02 | Selección de vehículo | CU-02 | RN-05, RN-09, RN-10 | CP-03, CP-04, CP-05 |
+| RF-03 | Cliente y conductor | CU-03 | RN-02, RN-03, RN-10 | CP-06, CP-07, CP-08 |
+| RF-04 | Cálculo de prima | CU-04 | RN-01 a RN-07, RN-10, RN-11 | CP-09 a CP-12 |
+| RF-05 | Cotización multiaseguradora | CU-04, CU-05 | RN-07, RN-13 | CP-13, CP-14 |
+| RF-06 | Historial | CU-06 | RN-12 | CP-15, CP-16, CP-22 |
+| RF-07 | Estadísticas | CU-08 | RN-12, RN-13 | CP-17 a CP-19 |
+| RF-08 | Solicitud formal | CU-07 | RN-12, RN-13 | CP-20, CP-21 |
+
+### 7.1 Pruebas funcionales propuestas
+
+| CP | Escenario | Resultado esperado |
+|---|---|---|
+| CP-01 | Registrar patente | Se conserva sin consultarla en la API. |
+| CP-02 | Cambiar solo la patente | Precio y factores permanecen iguales. |
+| CP-03 | Seleccionar datos técnicos válidos | Se conservan marca, modelo, año, versión y combustible. |
+| CP-04 | API de vehículos no disponible | Mensaje claro; no se avanza sin datos obligatorios. |
+| CP-05 | Año de fabricación futuro | Se rechaza. |
+| CP-06 | Registrar cliente y conductor válidos | Datos asociados a la cotización. |
+| CP-07 | Email con formato inválido | Error de validación. |
+| CP-08 | Conductor menor de 18 | No se calcula. |
+| CP-09 | Cotización válida con valores conocidos | Importe coincide con la fórmula documentada. |
+| CP-10 | Vehículo de 8 años | Factor antigüedad = 1,10. |
+| CP-11 | Alarma y GPS | Factor seguridad = 0,92. |
+| CP-12 | Código postal no configurado | Error y cálculo bloqueado. |
+| CP-13 | Tres aseguradoras disponibles | Tres propuestas correspondientes a la cobertura. |
+| CP-14 | Ordenar propuestas por importe | Orden ascendente con precios correctos. |
+| CP-15 | Consultar historial existente | Se recuperan cotizaciones del cliente autorizado. |
+| CP-16 | Cambiar tarifas después de cotizar | No se alteran registros históricos. |
+| CP-17 | Dashboard con datos | Total de cotizaciones correcto. |
+| CP-18 | Conversiones registradas | Tasa correcta, sin conversiones duplicadas. |
+| CP-19 | Cotizaciones por código postal | Agrupación correcta por ubicación. |
+| CP-20 | Confirmar solicitud | Registro vinculado a propuesta y cotización. |
+| CP-21 | Cancelar o confirmar dos veces | No se crea solicitud por cancelación ni conversión duplicada. |
+| CP-22 | Solicitud de historial no autorizada | Acceso rechazado y datos no divulgados. |
+
+### 7.2 Verificación de requisitos no funcionales
+
+| RNF | Evidencia prevista |
+|---|---|
+| RNF-01 Usabilidad | Recorrido manual con entradas válidas e inválidas. |
+| RNF-02 Responsive | Capturas/pruebas a 375, 768 y 1366 px. |
+| RNF-03 Rendimiento | Medición de consultas y cálculo interno; registrar entorno y excluir arranque en frío documentado. |
+| RNF-04 Seguridad | HTTPS, revisión de secretos, validaciones y pruebas de autorización. |
+| RNF-05 Compatibilidad | Flujo principal ejecutado en Chrome y Edge. |
+| RNF-06 Mantenibilidad | Estructura, README, `npm run lint`, `npm run build`. |
+| RNF-07 Manejo de errores | API caída y entradas inválidas sin mensajes técnicos internos. |
+| RNF-08 Despliegue | Ejecución local e integración desplegada Vercel–Render–Atlas. |
+
+### 7.3 Estado de las pruebas
+
+Los estados propuestos son **Pendiente**, **Aprobado**, **Fallido** y **Bloqueado**. Todos los CP anteriores deben considerarse *pendientes de ejecución* hasta que exista evidencia. Cambios futuros a un RF o RN requieren revisar los CU y CP vinculados.
+
+---
+
+## 8. Parametrización de reglas y alcance de implementación
+
+Los factores RN-01 a RN-06 y las primas RN-07 descritos en la sección 4 constituyen **la configuración inicial simulada propuesta** para el MVP. Las tablas de rangos y porcentajes son la fuente de verdad funcional; la implementación deberá usar los mismos valores.
+
+Para evitar duplicar constantes en múltiples servicios, se propone una configuración centralizada en el backend y, cuando el grupo implemente su persistencia, en documentos de configuración de MongoDB Atlas.
+
+| Parámetro | Valores iniciales de referencia | Fuente |
+|---|---|---|
+| `factoresZona` | Bajo 0,95; Medio 1,00; Alto 1,20 | RN-01 |
+| `factoresEdad` | 18–24: 1,20; 25–65: 1,00; >65: 1,10 | RN-02 |
+| `factoresLicencia` | <2: 1,15; 2–5: 1,05; >5: 1,00 | RN-03 |
+| `factoresCombustible` | Nafta 1,00; Diésel 1,05; GNC 1,03; Híbrido 0,98; Eléctrico 0,95 | RN-04 |
+| `factoresAntiguedadVehiculo` | 0–2: 0,95; 3–5: 1,00; 6–10: 1,10; 11–15: 1,20; >15: 1,35 | RN-05 |
+| `descuentosSeguridad` | Alarma 3 %; GPS 5 %; Cortacorriente 2 %; máximo 10 % | RN-06 |
+| `primasBase` | Tres aseguradoras × tres coberturas | RN-07 |
+| `codigosPostales` | Tabla acotada de códigos postales de prueba con categoría de riesgo | RN-01 |
+
+**Cálculo definido:** multiplicar los seis factores sobre la prima base y aplicar `BigDecimal`/`HALF_UP` con dos decimales al final; guardar factores y resultado por cada cotización. No se contempla recálculo retroactivo del historial.
+
+### 8.1 Estado documental frente a implementación
+
+Este documento especifica el **sistema previsto**, no una certificación de funcionamiento completo. La evidencia existente declarada en la documentación original es la creación inicial de la base y una colección de prueba; la consistencia con el nuevo modelo debe verificarse. No se presentan los diagramas, los CP ni las integraciones como funcionalidad ya terminada.
+
+---
+
+## 9. Glosario breve
+
+| Término | Significado |
+|---|---|
+| Prima base | Precio inicial mensual de una combinación aseguradora/cobertura antes de ajustes. |
+| Prima final | Resultado mensual luego de aplicar los seis factores y redondear. |
+| Factor | Multiplicador del precio: 1,00 sin cambio; >1 recargo; <1 descuento. |
+| Patente informativa | Identificador ingresado por el usuario, sin uso para consulta de vehículos ni factor de precio. |
+| Prospecto | Persona que consulta una cotización, sin ser todavía contratante de una póliza. |
+| Propuesta | Precio calculado por una aseguradora y cobertura determinados. |
+| Solicitud formal | Manifestación de interés registrada; no implica contrato, pago ni emisión real. |
+| Conversión | Cotización con una solicitud formal confirmada, contada una vez. |
+| Embedding | Almacenamiento de subdocumentos dentro de un documento MongoDB. |
+| API REST | Interfaz HTTP para intercambiar datos entre frontend y backend. |
