@@ -141,7 +141,7 @@ erDiagram
     COTIZACION ||--|| VEHICULO : embebe
     VEHICULO ||--|| SEGURIDAD : embebe
     COTIZACION ||--|| FACTORES_APLICADOS : embebe
-    COTIZACION ||--|{ PROPUESTA : contiene
+    COTIZACION ||--| PROPUESTA : contiene
     COTIZACION ||--o| SOLICITUD_FORMAL : puede_contener
 ```
 
