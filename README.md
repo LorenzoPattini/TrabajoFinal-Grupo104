@@ -87,31 +87,12 @@ Backend (Java + Spring Boot)
 
 El frontend se desplegará en **Vercel** y el backend en **Render**. La consulta externa de vehículos se realizará sin utilizar la patente como criterio de búsqueda.
 
-## Estado actual del proyecto
-
-El sistema se encuentra en desarrollo. Los avances documentados hasta esta etapa incluyen:
-
-- Definición de requerimientos funcionales, no funcionales y criterios de aceptación.
-- Especificación de las reglas de negocio, fórmula de cálculo y factores simulados.
-- Diseño del modelo de datos y documentación de la persistencia en MongoDB Atlas.
-- Elaboración de casos de uso, trazabilidad y diagramas de diseño propuestos.
-- Estructura inicial del backend en Java y Spring Boot.
-- Configuración inicial del frontend con React, TypeScript y Vite, y desarrollo de una página de inicio demostrativa.
-- Preparación de un cliente HTTP para su futura integración con el backend.
-
-**Funcionalidades pendientes de implementación e integración:** consulta real a la API externa de vehículos, formularios de cotización, motor de cálculo, persistencia e historial operativos, comparación de propuestas, registro de solicitudes formales, dashboard y despliegue integral.
-
-La existencia de requerimientos, diagramas o modelos propuestos en la documentación **no implica que esas funcionalidades ya estén implementadas**.
-
 ## Documentación técnica
 
 Los requerimientos, criterios de aceptación, reglas de negocio, modelos de datos, casos de uso, diagramas y matriz de trazabilidad se describen en:
 
 [Documentación del Sistema](docs/Documentacion-Sistema.md)
 
-Para instrucciones específicas de instalación y ejecución, consultar los archivos `README.md` de las carpetas `frontend/` y `backend/`.
 
-### 4️⃣ Panel de Estadísticas y Conversión (Dashboard)
-- **Embudo de conversión:** Indicadores que reflejan cuántos clientes pasan de la *"Cotización en Línea"* a la *"Solicitud Formal de Compra"*.
-- **Mapa de calor geográfico:** Estadísticas agrupadas por zona (código postal) para identificar regiones con mayor demanda o mayor tasa de cierre.
+
 
