@@ -20,7 +20,7 @@ Se utiliza **MongoDB Atlas** (NoSQL, orientado a documentos) en lugar de una bas
 ### 1.3 Decisión de diseño: embedding vs. referencias
 Se optó por embeber los datos del cliente, el vehículo y los factores aplicados dentro de cada documento de cotización, en lugar de crear colecciones separadas y referenciarlas. Motivo: una cotización es un registro histórico que no debe cambiar aunque el cliente actualice sus datos más adelante — necesitamos una "foto" congelada de la información tal como era en el momento de cotizar, no una referencia viva.
 
-### 1.4 Esquema propuesto de cotización
+### 1.4 Esquema de cotización
 
 El siguiente documento JSON es **un ejemplo de diseño**, no una exportación de un registro productivo. Representa una solicitud con varias propuestas, sus factores y el estado necesario para medir la conversión. En MongoDB, `_id` y las fechas pueden almacenarse con tipos BSON equivalentes.
 
@@ -147,7 +147,9 @@ erDiagram
 
 ### 1.6 Estado de persistencia y evidencia
 
-La documentación original indica que el equipo creó la base `cotizador-tfi`, la colección `cotizaciones` y un documento de prueba en MongoDB Atlas. **No se ha comprobado en esta revisión que el documento cargado coincida con el esquema ampliado de la sección 1.4.** El grupo deberá actualizarlo y adjuntar una captura o consulta de evidencia cuando corresponda.
+La base cotizador-tfi y la colección cotizaciones están creadas en el cluster de MongoDB Atlas del equipo. La captura muestra un documento de prueba con la estructura descripta en la sección 1.4.
+
+![Colección cotizaciones en MongoDB Atlas](img/atlas-coleccion-cotizaciones.png)
 
 ### 1.7 Diccionario de datos resumido
 
@@ -179,10 +181,10 @@ La documentación original indica que el equipo creó la base `cotizador-tfi`, l
 ## 2. Definición funcional de cada módulo
 
 ### Módulo 1 — Consulta de datos del vehículo
-- **Descripción:** permite registrar la patente como dato informativo y seleccionar, de forma independiente, las características técnicas del vehículo mediante información provista por una API externa de vehículos.
-- **Entrada:** patente ingresada manualmente por el usuario y selección de marca, modelo, año, versión y combustible, según los datos disponibles en la API externa.
-- **Proceso:** la patente no se envía a la API para consultar, validar ni recuperar información. La consulta externa se utiliza únicamente como fuente de datos para la selección de características del vehículo.
-- **Salida:** objeto `vehiculo` con la patente informativa y los datos técnicos seleccionados, que se utilizarán en el módulo de cálculo y se conservarán en la cotización.
+- **Descripción:** permite seleccionar el vehículo a partir del catálogo del mercado argentino provisto por la API de ArgAutos y registrar la patente como dato informativo.
+- **Entrada:** marca, año, modelo y versión elegidos en selectores dependientes; tipo de combustible sugerido por el sistema y confirmado por el usuario; indicación de equipo de GNC; patente ingresada manualmente.
+- **Proceso:** el backend consulta el catálogo de ArgAutos (marcas; modelos de una marca filtrados por año; versiones de un modelo filtradas por año), guarda las respuestas en caché y sugiere el combustible a partir del nombre de la versión.
+- **Salida:** objeto `vehiculo` con marca, modelo, versión, año, combustible y patente, que se usa en el cálculo y se conserva en la cotización.
 
 ### Módulo 2 — Gestión de usuarios/prospectos
 - **Descripción:** registra los datos del titular y conductor, y mantiene el historial de cotizaciones por cliente.
@@ -213,7 +215,7 @@ Cada requerimiento incluye criterios de aceptación que permitirán verificar su
 
 **Descripción:**
 
-El sistema deberá permitir ingresar y registrar la patente del vehículo como dato informativo, sin utilizarla para consultar o validar información mediante una API externa.
+El sistema deberá permitir seleccionar marca, año, modelo y versión del vehículo a partir del catálogo de la API de ArgAutos y confirmar el tipo de combustible, independientemente de la patente ingresada.
 
 **Criterios de aceptación:**
 
@@ -230,11 +232,14 @@ El sistema deberá permitir seleccionar marca, modelo, año, versión y tipo de 
 
 **Criterios de aceptación:**
 
-- CA-02.1: El usuario podrá consultar y seleccionar los datos técnicos del vehículo disponibles en la API externa.
-- CA-02.2: La selección de los datos técnicos se realizará sin utilizar la patente.
-- CA-02.3: El sistema conservará los datos seleccionados para utilizarlos en la cotización.
-- CA-02.4: El sistema informará al usuario cuando la API externa no esté disponible.
-- CA-02.5: No se permitirá continuar con la cotización si faltan datos técnicos obligatorios.
+- CA-02.1: El usuario podrá seleccionar la marca entre las disponibles en el catálogo de ArgAutos.
+- CA-02.2: Al elegir marca y año, el sistema mostrará solo los modelos con versiones para ese año; al elegir el modelo, solo las versiones de ese año.
+- CA-02.3: Al cambiar la marca, el año o el modelo, se reiniciarán las opciones dependientes.
+- CA-02.4: El sistema sugerirá el tipo de combustible a partir del nombre de la versión (RN-04); el usuario podrá confirmarlo o modificarlo e indicar si el vehículo tiene equipo de GNC.
+- CA-02.5: La selección se realizará sin utilizar la patente.
+- CA-02.6: Si el catálogo externo no está disponible, el sistema lo informará con un mensaje claro.
+- CA-02.7: No se permitirá continuar sin marca, año, modelo, versión y combustible.
+- CA-02.8: La interfaz mostrará la atribución "Datos de vehículos provistos por ArgAutos" con enlace al sitio.
 
 ### RF-03 – Registro de cliente y conductor
 
@@ -314,7 +319,7 @@ Cuando no existan cotizaciones registradas, la tasa de conversión se mostrará 
 
 Para evitar contar múltiples veces una misma cotización, cada cotización podrá contabilizarse como convertida una única vez.
 
-### RF-08 – Solicitud formal de contratación (funcionalidad propuesta)
+### RF-08 – Solicitud formal de contratación
 
 **Descripción:** El sistema deberá permitir seleccionar una de las propuestas generadas y registrar la intención de contratarla, sin efectuar pagos ni emitir una póliza real.
 
@@ -326,7 +331,7 @@ Para evitar contar múltiples veces una misma cotización, cada cotización podr
 - CA-08.5: No se permitirá contabilizar más de una conversión por cotización.
 - CA-08.6: Cancelar la confirmación no modificará el estado de la cotización.
 
-**Alcance:** solicitud de interés comercial, sin compra, cobro ni emisión de póliza. Requiere aprobación definitiva del equipo.
+**Alcance:** solicitud de interés comercial, sin compra, cobro ni emisión de póliza.
 
 ### 3.2 Requerimientos No Funcionales (RNF)
 
@@ -377,6 +382,7 @@ El sistema deberá aplicar medidas básicas de seguridad para proteger la inform
 - No deberán incluirse contraseñas ni claves privadas dentro del repositorio GitHub.
 - El backend deberá validar los datos recibidos antes de procesarlos o almacenarlos.
 - Las respuestas de error no deberán mostrar contraseñas ni información de configuración interna.
+- Las rutas de administración (historial y estadísticas) requieren autenticación; las credenciales del administrador se configuran mediante variables de entorno.
 
 **Verificación:** Revisión del repositorio, configuración de Vercel y Render, y pruebas de validación de entradas en la API.
 
@@ -493,7 +499,22 @@ Para el alcance inicial se establecerá una clasificación de códigos postales 
 | Riesgo medio | 1,00 | Sin modificación |
 | Riesgo alto | 1,20 | Recargo del 20 % |
 
-La relación entre códigos postales y categorías de riesgo será definida mediante una configuración interna.
+Para el alcance inicial se configuran los siguientes códigos postales de prueba. La clasificación es una simulación académica y no refleja estadísticas reales de siniestralidad.
+
+| Código Postal | Localidad | Categoría |
+|---|---|---|
+| 1000 | CABA (Centro) | Riesgo alto |
+| 1425 | CABA (Palermo) | Riesgo alto |
+| 2000 | Rosario | Riesgo alto |
+| 5000 | Córdoba | Riesgo alto |
+| 1900 | La Plata | Riesgo medio |
+| 3000 | Santa Fe | Riesgo medio |
+| 4000 | San Miguel de Tucumán | Riesgo medio |
+| 5500 | Mendoza | Riesgo medio |
+| 4600 | San Salvador de Jujuy | Riesgo bajo |
+| 6300 | Santa Rosa | Riesgo bajo |
+| 8400 | San Carlos de Bariloche | Riesgo bajo |
+| 9410 | Ushuaia | Riesgo bajo |
 
 Si el código postal no se encuentra configurado, el sistema informará que no es posible determinar el factor geográfico y solicitará una ubicación válida.
 
@@ -536,7 +557,18 @@ El sistema aplicará un factor según el tipo de combustible seleccionado.
 | Híbrido | 0,98 | Descuento del 2 % |
 | Eléctrico | 0,95 | Descuento del 5 % |
 
-El tipo de combustible formará parte de los datos técnicos obtenidos mediante la consulta a la API externa de vehículos.
+La API de ArgAutos no informa el tipo de combustible de cada versión. Por eso el sistema lo sugiere a partir de las palabras del nombre de la versión, y el usuario lo confirma o lo corrige:
+
+| El nombre de la versión contiene la palabra | Combustible sugerido |
+|---|---|
+| Diésel, Diesel, TDI, CRDi, D-4D, HDi | Diésel |
+| Hybrid, Híbrido | Híbrido |
+| Eléctrico, Electric, EV | Eléctrico |
+| Ninguna de las anteriores | Nafta |
+
+Por ejemplo, para la versión "Se-G 1.8 Hybrid CVT" el sistema sugiere Híbrido, y para "XEI 2.0 CVT" sugiere Nafta.
+
+El GNC se declara aparte, porque en Argentina es una conversión posterior a la compra: si el usuario indica que el vehículo tiene equipo de GNC, el combustible registrado es GNC y se aplica su factor.
 
 #### RN-05 – Factor por antigüedad del vehículo
 
@@ -618,19 +650,15 @@ No se utilizará para consultar APIs externas, recuperar características técni
 
 #### RN-09 – Obtención de datos técnicos del vehículo
 
-La información técnica se obtendrá mediante una API externa que permita consultar y seleccionar características del vehículo independientemente de su patente.
+La información técnica se obtiene del catálogo de la API de ArgAutos (https://argautos.com), que cubre el mercado automotor argentino, sin utilizar la patente.
 
-Los datos contemplados serán:
+La API provee marca, modelo, versión y años-modelo disponibles de cada versión. El combustible no lo provee la API y se determina según RN-04.
 
-- Marca.
-- Modelo.
-- Año de fabricación.
-- Versión.
-- Tipo de combustible.
+El año seleccionado debe estar entre los años-modelo disponibles de la versión y se usa para el factor de antigüedad (RN-05).
 
-El año de fabricación será utilizado para calcular el factor de antigüedad del vehículo.
+Las consultas las realiza el backend, nunca el navegador. Si la API no responde, el sistema usa los datos en caché o un catálogo local de respaldo; si no hay datos disponibles, informa el inconveniente y no permite continuar.
 
-En caso de que la API no esté disponible, el sistema informará el inconveniente y no continuará con la cotización hasta disponer de los datos obligatorios.
+El uso de la API exige mencionar a ArgAutos como fuente de datos en la aplicación.
 
 #### RN-10 – Validación de información
 
@@ -743,7 +771,7 @@ Este procedimiento se repetirá para las demás aseguradoras, utilizando sus res
 
 Los resultados son simulaciones académicas y no representan ofertas comerciales reales.
 
-### 4.5 Implementación técnica prevista
+### 4.5 Implementación técnica
 
 La lógica de cotización se implementará en el backend desarrollado con Java y Spring Boot.
 
@@ -784,11 +812,12 @@ El objetivo principal es demostrar la aplicación de reglas de negocio, la autom
 
 ### 5.1 Diagrama de flujo general
 
-Archivo previsto en el repositorio: `docs/TP_Final_Diagrama_de_Flujo.jpg`. **Verificar el contenido de la imagen antes de entregar**, porque este documento no modifica automáticamente ese archivo. El flujo acordado es: registro de patente informativa → consulta externa por selección de características (sin patente) → datos de conductor y zona → validación → cálculo → comparación → eventual solicitud formal.
+El diagrama muestra el recorrido completo del usuario: selección del vehículo en la interfaz del sistema (marca, año, modelo y versión, con opciones obtenidas de la API de ArgAutos), registro de la patente como dato informativo, datos del cliente y del conductor, validación, cálculo, comparación de propuestas y, opcionalmente, solicitud formal de contratación.
 
-### 5.2 Diagrama de clases propuesto
+![Diagrama de flujo general](img/TP_Final_Diagrama_de_Flujo.jpg)
 
-Representa entidades de dominio, atributos y relaciones del backend Java + Spring Boot; es un **diseño previsto, no evidencia de clases implementadas**.
+### 5.2 Diagrama de clases
+Representa las entidades de dominio del backend Java + Spring Boot, sus atributos y relaciones.
 
 ![Diagrama de clases del Cotizador de Seguros Automotores](https://github.com/user-attachments/assets/59303a16-47e2-457c-955e-5a025040b1e8)
 
@@ -799,7 +828,7 @@ Representa entidades de dominio, atributos y relaciones del backend Java + Sprin
 flowchart LR
     U["Usuario / Prospecto"]
     ADM["Administrador autorizado"]
-    API["API externa de vehículos"]
+    API["API ArgAutos"]
     subgraph SISTEMA["Cotizador de Seguros Automotores"]
         CU1(["CU-01 Registrar patente informativa"])
         CU2(["CU-02 Seleccionar vehículo"])
@@ -823,7 +852,7 @@ flowchart LR
 
 Es una representación funcional de actores y casos de uso en Mermaid. Para una entrega UML estricta, reproducir estos elementos en un diagrama de casos de uso UML (actores, elipses y límite del sistema).
 
-### 5.4 Diagrama de componentes propuesto
+### 5.4 Diagrama de componentes
 
 ```mermaid
 flowchart LR
@@ -845,10 +874,10 @@ flowchart LR
     end
     HTTP -->|"HTTPS / JSON"| REST
     PERS -->|"Driver MongoDB"| DB[("MongoDB Atlas")]
-    SERV -->|"Consulta técnica sin patente"| VEH["API externa de vehículos"]
+    SERV -->|"Catálogo con caché"| VEH["API ArgAutos"]
 ```
 
-### 5.5 Diagrama de despliegue previsto
+### 5.5 Diagrama de despliegue
 
 ```mermaid
 flowchart TB
@@ -856,10 +885,10 @@ flowchart TB
     VERCEL -.->|"Archivos estáticos"| BROWSER
     BROWSER -->|"HTTPS / REST"| RENDER["Render: API Spring Boot"]
     RENDER -->|"Conexión autenticada / TLS"| MONGO[("MongoDB Atlas")]
-    RENDER -->|"HTTPS"| API["API externa de vehículos"]
+    RENDER -->|"HTTPS + API key"| API["API ArgAutos"]
 ```
 
-El despliegue se presenta como arquitectura objetivo. Las URL definitivas, variables de entorno, CORS y disponibilidad de la API se verificarán durante la integración. El navegador consume la API desplegada; Vercel aloja el frontend y no ejecuta el algoritmo de cotización.
+El frontend se publica en Vercel y el backend en Render. El navegador descarga la aplicación desde Vercel y consume la API REST del backend; el algoritmo de cotización se ejecuta solo en el backend. Las credenciales (MongoDB Atlas, API key de ArgAutos y usuario administrador) se configuran como variables de entorno en Render, y el backend solo acepta peticiones del dominio del frontend (CORS).
 
 ---
 
@@ -869,9 +898,9 @@ El despliegue se presenta como arquitectura objetivo. Las URL definitivas, varia
 
 - **Usuario / Prospecto:** registra los datos, cotiza, compara y eventualmente manifiesta intención de contratar.
 - **Administrador autorizado:** consulta historial según permisos y visualiza estadísticas de conversión y demanda.
-- **API externa de vehículos:** servicio secundario que entrega información por selección de características, nunca a partir de la patente.
+- **API de ArgAutos:** servicio externo que provee el catálogo de marcas, modelos, versiones y años del mercado argentino. Se consulta desde el backend y nunca a partir de la patente.
 
-El acceso al historial requiere autorización. El mecanismo de autenticación y roles debe acordarse e implementarse antes de exponer datos personales. La propuesta inicial no requiere pagos ni emisión de pólizas.
+El historial de cotizaciones y las estadísticas solo están disponibles para el administrador. El backend protege las rutas `/api/admin/**` con Spring Security mediante autenticación HTTP Basic, con un único usuario administrador cuyas credenciales se configuran en las variables de entorno `ADMIN_USER` y `ADMIN_PASSWORD`. El usuario o prospecto no necesita registrarse para cotizar. La propuesta no incluye pagos ni emisión de pólizas.
 
 ### 6.2 Catálogo
 
@@ -882,7 +911,7 @@ El acceso al historial requiere autorización. El mecanismo de autenticación y 
 | CU-03 | Registrar cliente y conductor | Usuario | RF-03 |
 | CU-04 | Generar cotizaciones | Usuario | RF-04, RF-05 |
 | CU-05 | Comparar propuestas | Usuario | RF-05 |
-| CU-06 | Consultar historial | Usuario autorizado | RF-06 |
+| CU-06 | Consultar historial | Administrador | RF-06 |
 | CU-07 | Solicitar contratación | Usuario | RF-08 |
 | CU-08 | Consultar estadísticas | Administrador | RF-07 |
 
@@ -896,11 +925,11 @@ El acceso al historial requiere autorización. El mecanismo de autenticación y 
 
 ### CU-02 – Seleccionar datos del vehículo
 
-- **Precondición:** el usuario dispone del formulario y el servicio externo está accesible.
-- **Flujo principal:** (1) El sistema consulta el catálogo externo. (2) El usuario selecciona marca y modelo. (3) Selecciona año, versión y combustible entre opciones disponibles. (4) Se validan los datos obligatorios y se conservan.
-- **Alternativas:** servicio no disponible → mensaje y bloqueo de avance; datos incompletos → solicitar corrección; cambio de marca → actualizar opciones dependientes.
-- **Postcondición:** información técnica disponible para cotizar, independientemente de la patente.
-- **Reglas:** RN-05, RN-09, RN-10.
+- **Precondición:** el usuario inició una cotización.
+- **Flujo principal:** (1) El sistema muestra las marcas del catálogo de ArgAutos. (2) El usuario elige marca y año. (3) El sistema muestra los modelos de esa marca disponibles para ese año. (4) El usuario elige el modelo y el sistema muestra sus versiones para ese año. (5) El usuario elige la versión. (6) El sistema sugiere el combustible; el usuario lo confirma o lo cambia e indica si tiene GNC. (7) El sistema valida y conserva los datos.
+- **Alternativas:** catálogo no disponible y sin datos en caché → mensaje y bloqueo del avance; cambio de marca, año o modelo → se reinician las opciones dependientes; datos incompletos → solicitar corrección.
+- **Postcondición:** datos técnicos disponibles para cotizar, sin uso de la patente.
+- **Reglas:** RN-04, RN-05, RN-09, RN-10.
 
 ### CU-03 – Registrar cliente y conductor
 
@@ -928,8 +957,8 @@ El acceso al historial requiere autorización. El mecanismo de autenticación y 
 
 ### CU-06 – Consultar historial de cotizaciones
 
-- **Precondición:** existe un mecanismo de acceso autorizado y una identificación válida del cliente.
-- **Flujo principal:** (1) El usuario autorizado accede al historial. (2) Solicita las cotizaciones del cliente. (3) El backend verifica permisos. (4) Recupera y muestra fechas, vehículo, propuestas y valores históricos.
+- **Precondición:** el administrador inició sesión y conoce el DNI del cliente.
+- **Flujo principal:** (1) El administrador ingresa al panel con sus credenciales. (2) Busca las cotizaciones por DNI del cliente. (3) El backend verifica las credenciales. (4) Recupera y muestra fechas, vehículo, propuestas y valores históricos.
 - **Alternativas:** sin registros → listado vacío; sin autorización → denegar; fallo de BD → informar sin mostrar datos internos.
 - **Postcondición:** consulta de registros sin modificarlos.
 - **Reglas:** RN-12.
@@ -940,11 +969,11 @@ El acceso al historial requiere autorización. El mecanismo de autenticación y 
 - **Flujo principal:** (1) El usuario selecciona una propuesta. (2) El sistema muestra resumen. (3) El usuario confirma. (4) Se registra `solicitudFormal` y estado `SOLICITUD_FORMAL`. (5) Se comunica el resultado.
 - **Alternativas:** cancelar → sin cambios; segunda confirmación → no duplicar conversión; error al guardar → mostrar fallo.
 - **Postcondición:** intención comercial registrada, sin emitir póliza ni cobrar.
-- **Reglas:** RN-12, RN-13. **Asociado a RF-08 propuesto.**
+- **Reglas:** RN-12, RN-13. **Asociado a RF-08.**
 
 ### CU-08 – Consultar estadísticas y conversión
 
-- **Precondición:** acceso administrativo autorizado.
+- **Precondición:** El administrador inició sesión.
 - **Flujo principal:** (1) El administrador solicita el dashboard. (2) El backend agrega cotizaciones por código postal y cuenta cotizaciones y conversiones únicas. (3) Calcula tasa = convertidas / total × 100. (4) Muestra indicadores.
 - **Alternativas:** sin cotizaciones → totales y tasa en 0; error de consulta → mensaje controlado.
 - **Postcondición:** visualización estadística sin modificar registros.
@@ -959,7 +988,7 @@ La siguiente matriz vincula requerimientos, reglas y casos de uso. **Los CP son 
 | RF | Descripción resumida | CU | RN | CP previstos |
 |---|---|---|---|---|
 | RF-01 | Patente informativa | CU-01 | RN-08 | CP-01, CP-02 |
-| RF-02 | Selección de vehículo | CU-02 | RN-05, RN-09, RN-10 | CP-03, CP-04, CP-05 |
+| RF-02 | Selección de vehículo | CU-02 | RN-05, RN-09, RN-10 | CP-03, CP-04, CP-05, CP-23 |
 | RF-03 | Cliente y conductor | CU-03 | RN-02, RN-03, RN-10 | CP-06, CP-07, CP-08 |
 | RF-04 | Cálculo de prima | CU-04 | RN-01 a RN-07, RN-10, RN-11 | CP-09 a CP-12 |
 | RF-05 | Cotización multiaseguradora | CU-04, CU-05 | RN-07, RN-13 | CP-13, CP-14 |
@@ -993,6 +1022,7 @@ La siguiente matriz vincula requerimientos, reglas y casos de uso. **Los CP son 
 | CP-20 | Confirmar solicitud | Registro vinculado a propuesta y cotización. |
 | CP-21 | Cancelar o confirmar dos veces | No se crea solicitud por cancelación ni conversión duplicada. |
 | CP-22 | Solicitud de historial no autorizada | Acceso rechazado y datos no divulgados. |
+| CP-23 | Versión con "Hybrid" en el nombre | Combustible sugerido: Híbrido, editable por el usuario. |
 
 ### 7.2 Verificación de requisitos no funcionales
 
@@ -1028,17 +1058,66 @@ Para evitar duplicar constantes en múltiples servicios, se propone una configur
 | `factoresAntiguedadVehiculo` | 0–2: 0,95; 3–5: 1,00; 6–10: 1,10; 11–15: 1,20; >15: 1,35 | RN-05 |
 | `descuentosSeguridad` | Alarma 3 %; GPS 5 %; Cortacorriente 2 %; máximo 10 % | RN-06 |
 | `primasBase` | Tres aseguradoras × tres coberturas | RN-07 |
-| `codigosPostales` | Tabla acotada de códigos postales de prueba con categoría de riesgo | RN-01 |
+| `codigosPostales` | 12 códigos postales de prueba | RN-01 |
 
 **Cálculo definido:** multiplicar los seis factores sobre la prima base y aplicar `BigDecimal`/`HALF_UP` con dos decimales al final; guardar factores y resultado por cada cotización. No se contempla recálculo retroactivo del historial.
 
-### 8.1 Estado documental frente a implementación
+### 8.1 Estado de implementación
 
-Este documento especifica el **sistema previsto**, no una certificación de funcionamiento completo. La evidencia existente declarada en la documentación original es la creación inicial de la base y una colección de prueba; la consistencia con el nuevo modelo debe verificarse. No se presentan los diagramas, los CP ni las integraciones como funcionalidad ya terminada.
+| Componente | Estado | Evidencia |
+|---|---|---|
+| Base de datos en MongoDB Atlas | Implementado | Base `cotizador-tfi` y colección `cotizaciones` con un documento de prueba (sección 1.6). |
+| Proyecto backend (Java 21 + Spring Boot) | Implementado | Proyecto Gradle inicializado con Spring Web MVC, Data MongoDB, Validation, Actuator y Lombok; conexión a Atlas por la variable de entorno `MONGODB_URI`. |
+| Proyecto frontend (React + TypeScript + Vite) | Implementado | Proyecto configurado con ESLint, React Router y cliente HTTP Axios centralizado en `src/services/api.ts`; pantalla de inicio responsive. |
+| Integración con la API de ArgAutos | En desarrollo | API evaluada y probada manualmente (marcas, modelos y versiones filtrados por año); API key de uso académico obtenida. Integración en el backend pendiente. |
+| Motor de cálculo (RN-01 a RN-07, RN-11) | Pendiente | — |
+| Generación y guardado de cotizaciones (RF-04, RF-05) | Pendiente | — |
+| Formulario de cotización y comparación de propuestas | Pendiente | — |
+| Historial y solicitud formal (RF-06, RF-08) | Pendiente | — |
+| Autenticación del administrador | Pendiente | — |
+| Dashboard de estadísticas (RF-07) | Pendiente | — |
+| Despliegue en Vercel y Render | Pendiente | — |
+
+Los componentes pendientes se completarán antes de la instancia de examen, siguiendo las reglas y casos de uso definidos en este documento.
 
 ---
 
-## 9. Glosario breve
+## 9. Integración con la API de ArgAutos
+
+### 9.1 Decisión y alternativas evaluadas
+
+Para la selección del vehículo se evaluaron distintas fuentes de datos. Se descartaron las que usan la patente como clave de búsqueda, por contradecir RN-08, y las que no cubren el mercado argentino.
+
+| Alternativa | Qué ofrece | Resultado |
+|---|---|---|
+| APIs por patente (clasific.ar, patente-ar) | Datos a partir del dominio: verificación, multas, VTV, deuda | Descartada: usan la patente como clave, lo que contradice RN-08, y no son un catálogo de marcas y modelos. |
+| Tabla FIPE (Brasil) | Catálogo gratuito de marca, modelo y año, con combustible | Descartada: mercado brasileño, con versiones y denominaciones distintas de las argentinas. |
+| ArgAutos | Catálogo del mercado argentino: marcas, modelos, versiones y años-modelo, con filtro por año y documentación OpenAPI | **Elegida.** No informa el combustible, que se resuelve según RN-04. |
+
+El equipo obtuvo de ArgAutos una API key de uso académico vigente hasta el 23 de diciembre de 2026, con la condición de citar a ArgAutos como fuente de datos.
+
+### 9.2 Endpoints utilizados
+
+URL base: `https://argautos.com/api/v1`. No se utilizan los endpoints de precios.
+
+| Uso en el sistema | Endpoint de ArgAutos |
+|---|---|
+| Listar marcas | `GET /argautos/brands?per_page=100` |
+| Modelos de una marca para un año | `GET /argautos/brands/{brand}/models?year={año}&per_page=100` |
+| Versiones de un modelo para un año | `GET /argautos/models/{model}/versions?year={año}&per_page=100` |
+
+Cada versión incluye la lista de años-modelo disponibles (`available_years`), que se usa para validar el año elegido.
+
+### 9.3 Funcionamiento
+
+- **Credencial:** la API key se envía desde el backend en el encabezado `Authorization: Bearer` y se configura en la variable de entorno `ARGAUTOS_API_KEY`. Nunca se incluye en el repositorio ni en el frontend. Si la variable no está definida, el backend consulta sin key (acceso público limitado a 3 consultas por minuto).
+- **Caché:** las marcas se guardan durante toda la ejecución; los modelos y las versiones, por marca o modelo y año. Un recorrido repetido no consume consultas.
+- **Límites:** con la API key, 15 consultas por minuto. Si la API responde 429, el backend usa la caché o informa al usuario que reintente en unos segundos.
+- **Errores:** las respuestas 404, 422 y 429 y las fallas de conexión se traducen a mensajes comprensibles, sin detalles internos (RNF-07).
+- **Respaldo:** un catálogo local (archivo JSON con algunas marcas, modelos y versiones) permite completar el flujo si la API no está disponible.
+- **Atribución:** la pantalla de selección del vehículo y el pie de página muestran "Datos de vehículos provistos por ArgAutos" con enlace a https://argautos.com.
+
+## 10. Glosario breve
 
 | Término | Significado |
 |---|---|
