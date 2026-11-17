@@ -87,6 +87,12 @@ El proyecto fue generado con **Spring Initializr** y contiene:
 
 ---
 
+## Confiuración inicial para creación rápida con Spring Boot
+
+![Confiuración Spring Boot](docs/img/spring-initializr.png)
+
+---
+
 **Paquete raíz:** `com.TP_Final.cotizador`
 
 ---
