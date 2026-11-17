@@ -1,1 +1,7 @@
-".idea/" 
+.idea/
+.vscode/
+.env
+*.log
+node_modules/
+backend/build/
+backend/.gradle/

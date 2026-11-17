@@ -8,13 +8,14 @@ Backend del Trabajo Final Integrador desarrollado con **Java + Spring Boot**. Ac
 
 ## 📋 Tabla de Contenidos
 
-- [Estado Actual](#estado-actual)
-- [Tecnologías y Dependencias](#tecnologías-y-dependencias)
-- [Estructura del Proyecto](#estructura-del-proyecto)
-- [Configuración Actual](#configuración-actual)
-- [Cómo Ejecutar el Proyecto](#cómo-ejecutar-el-proyecto)
-- [Próximos Pasos](#próximos-pasos)
-- [Autores](#autores)
+- [Estado Actual](#-estado-actual)
+- [Tecnologías y Dependencias](#️-tecnologías-y-dependencias)
+- [Estructura del Proyecto](#-estructura-del-proyecto)
+- [Configuración inicial con Spring Boot](#configuración-inicial-con-spring-boot)
+- [Configuración Actual](#️-configuración-actual)
+- [Variables de entorno](#variables-de-entorno)
+- [Cómo ejecutar](#cómo-ejecutar)
+
 
 ---
 
@@ -27,7 +28,6 @@ El proyecto fue generado con **Spring Initializr** y contiene:
 - Archivo `settings.gradle` con el nombre del proyecto: `cotizador`.
 - Clase principal `CotizadorApplication.java` con la anotación `@SpringBootApplication`.
 - Archivo `application.yaml` con la configuración mínima de Spring y MongoDB.
-- Documentación autogenerada por Spring Initializr (`HELP.md`).
 - Archivo `README.md` (este documento).
 
 ---
@@ -57,39 +57,42 @@ El proyecto fue generado con **Spring Initializr** y contiene:
 | `spring-boot-starter-*-test` | testImplementation | Starters de testing para cada módulo. |
 | `junit-platform-launcher` | testRuntimeOnly | Ejecución de tests con JUnit 5. |
 
-> **Nota:** Las dependencias están alineadas con la configuración elegida en Spring Initializr. Se recomienda **evaluar la migración a Spring Boot 3.3.x** antes de avanzar con la lógica de negocio, ya que la rama 4.x es muy reciente y puede presentar incompatibilidades con librerías externas (PDF, correo, drivers).
-
 ---
 
 ## 📂 Estructura del Proyecto
 
-    backend/
-    ├── gradle/
-    │ └── wrapper/
-    │ ├── gradle-wrapper.jar
-    │ └── gradle-wrapper.properties
-    ├── src/
-    │ └── main/
-    │ ├── java/
-    │ │ └── com/TP_Final/cotizador/
-    │ │ └── CotizadorApplication.java
-    │ └── resources/
-    │ └── application.yaml
-    ├── .gitattributes
-    ├── .gitignore
-    ├── build.gradle
-    ├── gradlew
-    ├── gradlew.bat
-    ├── HELP.md
-    ├── README.md
-    ├── settings.gradle
-    └── main.iml
+```text
+backend/
+├── gradle/
+│   └── wrapper/
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/TP_Final/cotizador/
+│   │   │       └── CotizadorApplication.java
+│   │   └── resources/
+│   │       └── application.yaml
+│   └── test/
+│       └── java/
+│           └── com/TP_Final/cotizador/
+│               └── CotizadorApplicationTests.java
+├── .env.example
+├── .gitattributes
+├── .gitignore
+├── build.gradle
+├── gradlew
+├── gradlew.bat
+├── README.md
+└── settings.gradle
+```
 
 ---
 
-## Confiuración inicial para creación rápida con Spring Boot
+## Configuración inicial con Spring Boot
 
-![Confiuración Spring Boot](docs/img/spring-initializr.png)
+![Configuración Spring Boot](../docs/img/spring-initializr.png)
 
 ---
 
@@ -104,4 +107,52 @@ El proyecto fue generado con **Spring Initializr** y contiene:
 rootProject.name = 'cotizador'
 ```
 
+### `application.yaml`
+
+El archivo `application.yaml` contiene la configuración
+básica de Spring Boot y la conexión a MongoDB.
+
+La URI de conexión se obtiene mediante la variable
+de entorno `MONGODB_URI`, evitando incluir
+credenciales directamente en el código fuente.
+
 ---
+
+
+## Variables de entorno
+
+| Variable | Descripción |
+|---|---|
+| MONGODB_URI | URI de conexión a MongoDB Atlas. |
+| ARGAUTOS_API_KEY | Clave de acceso a ArgAutos. |
+| ADMIN_USER | Usuario administrador. |
+| ADMIN_PASSWORD | Contraseña del administrador. |
+
+Las variables se encuentran documentadas en
+`backend/.env.example` sin incluir credenciales reales.
+
+Actualmente, `application.yaml` utiliza `MONGODB_URI`
+para configurar la conexión con MongoDB.
+Las variables `ARGAUTOS_API_KEY`, `ADMIN_USER` y
+`ADMIN_PASSWORD` están documentadas para las
+funcionalidades que se incorporarán posteriormente.
+
+## Cómo ejecutar
+
+Para ejecutar el backend es necesario tener Java 21 instalado y configurar la variable de entorno `MONGODB_URI` con una cadena de conexión válida. El archivo `.env.example` documenta las variables necesarias, pero no configura automáticamente el entorno.
+
+Desde la carpeta `backend/`:
+
+**Linux o macOS:**
+
+```bash
+./gradlew bootRun
+```
+
+**Windows:**
+
+```powershell
+.\gradlew.bat bootRun
+```
+
+Por defecto, Spring Boot utiliza el puerto 8080.

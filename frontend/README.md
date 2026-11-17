@@ -27,7 +27,7 @@ Las pantallas definitivas, rutas y flujo completo de cotización se incorporará
 - **TypeScript:** tipado estático del código frontend.
 - **Vite:** entorno de desarrollo y herramienta de construcción.
 - **Axios:** consumo de la API REST del backend.
-- **React Router DOM:** navegación entre las distintas vistas del sistema.
+- **React Router DOM:** dependencia incorporada para implementar la navegación entre las distintas vistas del sistema.
 - **ESLint:** análisis estático y mantenimiento de calidad del código.
 - **Vercel:** plataforma prevista para el despliegue del frontend.
 
@@ -35,37 +35,44 @@ Las pantallas definitivas, rutas y flujo completo de cotización se incorporará
 
 ```text
 frontend/
+├── public/
+│   └── favicon.svg
 ├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── pages/
 │   ├── services/
 │   │   └── api.ts
-│   ├── types/
+│   ├── App.css
 │   ├── App.tsx
 │   ├── index.css
 │   └── main.tsx
+├── .env.example
+├── .gitignore
+├── eslint.config.js
+├── index.html
 ├── package.json
-├── vite.config.ts
-└── README.md
+├── package-lock.json
+├── README.md
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.ts
 ```
+
 
 ### Carpetas principales
 
-**assets/**  
-Recursos estáticos utilizados por la aplicación, como imágenes e íconos.
+**public/**  
+Contiene los recursos públicos de la aplicación,
+como el favicon.
 
-**components/**  
-Componentes reutilizables de la interfaz.
+**src/**  
+Contiene el código fuente de la aplicación React,
+incluyendo la pantalla inicial y sus estilos.
 
-**pages/**  
-Vistas principales del sistema. Su estructura definitiva será incorporada a medida que se defina el flujo funcional.
+**src/services/**  
+Contiene el cliente HTTP centralizado,
+configurado con Axios para la comunicación
+con el backend.
 
-**services/**  
-Servicios responsables de la comunicación con APIs externas y con el backend.
-
-**types/**  
-Interfaces y tipos de TypeScript utilizados para representar las entidades manejadas por el frontend.
 
 ## Comunicación con el backend
 
@@ -109,9 +116,29 @@ Es necesario contar con:
 - Node.js
 - npm
 
+### Configuración de variables de entorno
+
+Desde la carpeta `frontend/`, copiar el archivo
+`.env.example` como `.env`.
+
+En Windows (PowerShell):
+
+```powershell
+Copy-Item .env.example .env
+```
+
+En Linux o macOS:
+
+```bash
+cp .env.example .env
+```
+
+La variable `VITE_API_URL` permite configurar
+la dirección del backend.
+
 ### Instalación
 
-Desde la carpeta `frontend` ejecutar:
+Desde la carpeta `frontend/`, ejecutar:
 
 ```bash
 npm install
@@ -123,11 +150,9 @@ npm install
 npm run dev
 ```
 
-Por defecto, Vite levanta la aplicación en:
+Por defecto, Vite inicia la aplicación en:
 
-```text
 http://localhost:5173
-```
 
 ## Scripts disponibles
 
