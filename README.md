@@ -36,7 +36,7 @@ Se eligió MongoDB Atlas por su modelo de documentos, que permite guardar en una
 ### 1. Consulta de datos del vehículo
 
 - **Patente informativa:** el usuario ingresará la patente manualmente para registrarla junto a los datos del vehículo. No se utilizará para buscar, consultar o validar datos mediante una API externa, ni modificará el precio de la cotización.
-- **Consulta de características técnicas:** se integra la API de ArgAutos, que provee el catálogo de vehículos del mercado argentino para seleccionar marca, modelo, año de fabricación, versión y tipo de combustible, independientemente de la patente.
+- **Consulta de características técnicas:** se utilizará la API de ArgAutos, proveedor del catálogo de vehículos del mercado argentino, para seleccionar marca, modelo, año de fabricación, versión y tipo de combustible, independientemente de la patente. La integración con el backend se encuentra pendiente de implementación.
 - **Antigüedad del automóvil:** se calculará a partir del año de fabricación y se utilizará como factor en el precio del seguro.
 
 ### 2. Registro de clientes y conductores
@@ -86,7 +86,7 @@ Backend (Java + Spring Boot)
    MongoDB Atlas    API ArgAutos
 ```
 
-El frontend se desplegará en Vercel y el backend en Render. La consulta al catálogo de ArgAutos se realizará mediante la selección de las características del vehículo, sin utilizar la patente como criterio de búsqueda.
+El frontend se desplegará en **Vercel** y el backend en **Render**. La arquitectura presentada corresponde al diseño previsto del sistema. La integración con ArgAutos está pendiente y utilizará las características seleccionadas del vehículo, sin consultar datos mediante la patente.
 
 ## Documentación
 
@@ -142,5 +142,5 @@ http://localhost:5173.
 
 ## Fuentes de datos
 
-Los datos de vehículos (marcas, modelos, versiones y años) son provistos por [ArgAutos](https://argautos.com).
+La API de [ArgAutos](https://argautos.com) es la fuente seleccionada para obtener los datos de vehículos (marcas, modelos, versiones y años). Su integración con el backend se encuentra pendiente de implementación.
 
