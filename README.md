@@ -140,5 +140,7 @@ npm run dev
 Por defecto, la aplicación estará disponible en
 http://localhost:5173.
 
+## Fuentes de datos
 
+Los datos de vehículos (marcas, modelos, versiones y años) son provistos por [ArgAutos](https://argautos.com).
 
