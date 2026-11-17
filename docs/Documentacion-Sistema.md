@@ -141,7 +141,7 @@ erDiagram
     COTIZACION ||--|| VEHICULO : embebe
     VEHICULO ||--|| SEGURIDAD : embebe
     COTIZACION ||--|| FACTORES_APLICADOS : embebe
-    COTIZACION ||--| PROPUESTA : contiene
+    COTIZACION ||--|| PROPUESTA : contiene
     COTIZACION ||--o| SOLICITUD_FORMAL : puede_contener
 ```
 
@@ -197,7 +197,7 @@ La base cotizador-tfi y la colección cotizaciones están creadas en el cluster 
 - **Salida:** documento `cotizacion` completo, persistido en la colección `cotizaciones`.
 
 ### Módulo 4 — Dashboard de estadísticas
-- **Descripción:** presenta el embudo de conversión (cotización → solicitud formal) y un mapa de calor geográfico por zona.
+- **Descripción:** presenta el embudo de conversión (cotizaciones generadas → solicitudes formales), la tasa de conversión y la cantidad de cotizaciones por código postal, en una tabla y un gráfico de barras.
 - **Entrada:** lectura agregada sobre la colección `cotizaciones`.
 - **Salida:** visualizaciones para el equipo comercial.
 
@@ -318,6 +318,8 @@ Tasa de conversión (%) = (Cantidad de cotizaciones convertidas en solicitud for
 Cuando no existan cotizaciones registradas, la tasa de conversión se mostrará como 0 %.
 
 Para evitar contar múltiples veces una misma cotización, cada cotización podrá contabilizarse como convertida una única vez.
+
+La visualización de la demanda sobre un mapa geográfico queda fuera del alcance de esta versión y se considera una mejora futura.
 
 ### RF-08 – Solicitud formal de contratación
 
@@ -814,79 +816,27 @@ El objetivo principal es demostrar la aplicación de reglas de negocio, la autom
 
 El diagrama muestra el recorrido completo del usuario: selección del vehículo en la interfaz del sistema (marca, año, modelo y versión, con opciones obtenidas de la API de ArgAutos), registro de la patente como dato informativo, datos del cliente y del conductor, validación, cálculo, comparación de propuestas y, opcionalmente, solicitud formal de contratación.
 
-![Diagrama de flujo general](img/TP_Final_Diagrama_de_Flujo.jpg)
+![Diagrama de flujo general](img/diagrama-flujo.png)
 
 ### 5.2 Diagrama de clases
 Representa las entidades de dominio del backend Java + Spring Boot, sus atributos y relaciones.
 
-![Diagrama de clases del Cotizador de Seguros Automotores](https://github.com/user-attachments/assets/59303a16-47e2-457c-955e-5a025040b1e8)
+![Diagrama de clases del Cotizador de Seguros Automotores](img/diagrama-clases.png)
 
 
-### 5.3 Diagrama de casos de uso (visión funcional)
+### 5.3 Diagrama de casos de uso
 
-```mermaid
-flowchart LR
-    U["Usuario / Prospecto"]
-    ADM["Administrador autorizado"]
-    API["API ArgAutos"]
-    subgraph SISTEMA["Cotizador de Seguros Automotores"]
-        CU1(["CU-01 Registrar patente informativa"])
-        CU2(["CU-02 Seleccionar vehículo"])
-        CU3(["CU-03 Registrar datos personales"])
-        CU4(["CU-04 Generar cotizaciones"])
-        CU5(["CU-05 Comparar propuestas"])
-        CU6(["CU-06 Consultar historial"])
-        CU7(["CU-07 Solicitar contratación"])
-        CU8(["CU-08 Consultar estadísticas"])
-    end
-    U --- CU1
-    U --- CU2
-    U --- CU3
-    U --- CU4
-    U --- CU5
-    U --- CU7
-    ADM --- CU6
-    ADM --- CU8
-    API --- CU2
-```
+![Diagrama de casos de uso (visión funcional)](img/diagrama-clases-usos.png)
 
 Es una representación funcional de actores y casos de uso en Mermaid. Para una entrega UML estricta, reproducir estos elementos en un diagrama de casos de uso UML (actores, elipses y límite del sistema).
 
 ### 5.4 Diagrama de componentes
 
-```mermaid
-flowchart LR
-    subgraph FRONT["Frontend - React / TypeScript"]
-        UI["Formularios y comparación"]
-        DASH["Dashboard"]
-        HTTP["Cliente HTTP Axios"]
-        UI --> HTTP
-        DASH --> HTTP
-    end
-    subgraph BACK["Backend - Java / Spring Boot"]
-        REST["API REST / controladores"]
-        SERV["Servicios de cotización"]
-        FACT["Cálculo de factores"]
-        PERS["Repositorios de persistencia"]
-        REST --> SERV
-        SERV --> FACT
-        SERV --> PERS
-    end
-    HTTP -->|"HTTPS / JSON"| REST
-    PERS -->|"Driver MongoDB"| DB[("MongoDB Atlas")]
-    SERV -->|"Catálogo con caché"| VEH["API ArgAutos"]
-```
+![Diagrama de componentes](img/diagrama-componentes.png)
 
 ### 5.5 Diagrama de despliegue
 
-```mermaid
-flowchart TB
-    BROWSER["Navegador del usuario"] -->|"HTTPS"| VERCEL["Vercel: aplicación React compilada"]
-    VERCEL -.->|"Archivos estáticos"| BROWSER
-    BROWSER -->|"HTTPS / REST"| RENDER["Render: API Spring Boot"]
-    RENDER -->|"Conexión autenticada / TLS"| MONGO[("MongoDB Atlas")]
-    RENDER -->|"HTTPS + API key"| API["API ArgAutos"]
-```
+![Diagrama de despliegue](img/diagrama-despliegue.png)
 
 El frontend se publica en Vercel y el backend en Render. El navegador descarga la aplicación desde Vercel y consume la API REST del backend; el algoritmo de cotización se ejecuta solo en el backend. Las credenciales (MongoDB Atlas, API key de ArgAutos y usuario administrador) se configuran como variables de entorno en Render, y el backend solo acepta peticiones del dominio del frontend (CORS).
 
