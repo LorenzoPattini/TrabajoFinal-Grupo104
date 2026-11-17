@@ -36,7 +36,7 @@ Se eligió MongoDB Atlas por su modelo de documentos, que permite guardar en una
 ### 1. Consulta de datos del vehículo
 
 - **Patente informativa:** el usuario ingresará la patente manualmente para registrarla junto a los datos del vehículo. No se utilizará para buscar, consultar o validar datos mediante una API externa, ni modificará el precio de la cotización.
-- **Consulta de características técnicas:** se prevé integrar una API externa de vehículos para seleccionar marca, modelo, año de fabricación, versión y tipo de combustible, independientemente de la patente.
+- **Consulta de características técnicas:** se integra la API de ArgAutos, que provee el catálogo de vehículos del mercado argentino para seleccionar marca, modelo, año de fabricación, versión y tipo de combustible, independientemente de la patente.
 - **Antigüedad del automóvil:** se calculará a partir del año de fabricación y se utilizará como factor en el precio del seguro.
 
 ### 2. Registro de clientes y conductores
@@ -71,7 +71,8 @@ El usuario podrá seleccionar una propuesta y registrar su intención de contrat
 
 - **Embudo de conversión:** indicadores de cotizaciones generadas y de aquellas que avanzan a una solicitud formal de contratación.
 - **Tasa de conversión:** proporción de cotizaciones que derivan en una solicitud formal, evitando contabilizar una misma cotización convertida más de una vez.
-- **Demanda por zona:** estadísticas agrupadas por código postal para identificar las regiones con mayor cantidad de cotizaciones, con visualización geográfica prevista.
+- **Demanda por zona:** estadísticas agrupadas por código postal para identificar las regiones con mayor cantidad de cotizaciones.
+
 
 ## Arquitectura prevista
 
@@ -82,17 +83,62 @@ Frontend (React + TypeScript)
 Backend (Java + Spring Boot)
          |             |
          v             v
-   MongoDB Atlas   API externa de vehículos
+   MongoDB Atlas    API ArgAutos
 ```
 
-El frontend se desplegará en **Vercel** y el backend en **Render**. La consulta externa de vehículos se realizará sin utilizar la patente como criterio de búsqueda.
+El frontend se desplegará en Vercel y el backend en Render. La consulta al catálogo de ArgAutos se realizará mediante la selección de las características del vehículo, sin utilizar la patente como criterio de búsqueda.
 
-## Documentación técnica
+## Documentación
 
-Los requerimientos, criterios de aceptación, reglas de negocio, modelos de datos, casos de uso, diagramas y matriz de trazabilidad se describen en:
+- [Documentación del sistema](docs/Documentacion-Sistema.md):
+  requerimientos, reglas de negocio, modelo de datos,
+  casos de uso, diagramas y matriz de trazabilidad.
+- [API REST del backend](docs/API.md):
+  estado actual, configuración y endpoints disponibles.
 
-[Documentación del Sistema](docs/Documentacion-Sistema.md)
+## Cómo ejecutar
 
+### Backend
+
+Para ejecutar el backend, configurar las variables
+de entorno documentadas en `backend/.env.example`.
+
+Desde la carpeta `backend/`, ejecutar:
+
+**Linux o macOS:**
+
+```bash
+./gradlew bootRun
+```
+
+**Windows:**
+
+```powershell
+.\gradlew.bat bootRun
+```
+
+El servidor utiliza el puerto 8080 por defecto.
+La ruta `/api` está prevista para los endpoints REST.
+
+### Frontend
+
+Desde la carpeta `frontend/`, copiar
+`.env.example` como `.env`.
+
+Instalar las dependencias:
+
+```bash
+npm install
+```
+
+Iniciar el servidor de desarrollo:
+
+```bash
+npm run dev
+```
+
+Por defecto, la aplicación estará disponible en
+http://localhost:5173.
 
 
 

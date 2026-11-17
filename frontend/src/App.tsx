@@ -42,7 +42,7 @@ function App() {
 
             <div className="preview-item">
               <span>Vehículo</span>
-              <strong>Datos por patente</strong>
+              <strong>Catálogo del mercado argentino</strong>
             </div>
 
             <div className="preview-item">
@@ -62,7 +62,17 @@ function App() {
             <span className="feature-number">01</span>
             <h3>Datos del vehículo</h3>
             <p>
-              Consulta de información del automóvil a partir de la patente.
+              Selección de marca, año, modelo y versión a partir del catálogo de ArgAutos.
+            </p>
+            <p>
+              Datos de vehículos provistos por{" "}
+              <a
+                href="https://argautos.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ArgAutos
+              </a>
             </p>
           </article>
 

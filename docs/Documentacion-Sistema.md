@@ -228,7 +228,7 @@ El sistema deberá permitir seleccionar marca, año, modelo y versión del vehí
 
 **Descripción:**
 
-El sistema deberá permitir seleccionar marca, modelo, año, versión y tipo de combustible utilizando la información disponible en una API externa de vehículos, independientemente de la patente ingresada.
+El sistema deberá permitir seleccionar marca, modelo, año, versión y tipo de combustible utilizando la información disponible en una API de ArgAutos, independientemente de la patente ingresada.
 
 **Criterios de aceptación:**
 
@@ -989,7 +989,7 @@ La siguiente matriz vincula requerimientos, reglas y casos de uso. **Los CP son 
 
 ### 7.3 Estado de las pruebas
 
-Los estados propuestos son **Pendiente**, **Aprobado**, **Fallido** y **Bloqueado**. Todos los CP anteriores deben considerarse *pendientes de ejecución* hasta que exista evidencia. Cambios futuros a un RF o RN requieren revisar los CU y CP vinculados.
+Los estados definidos para registrar los resultados de los casos de prueba son **Pendiente**, **Aprobado**, **Fallido** y **Bloqueado**. Todos los CP anteriores deben considerarse *pendientes de ejecución* hasta que exista evidencia. Cambios futuros a un RF o RN requieren revisar los CU y CP vinculados.
 
 ---
 
